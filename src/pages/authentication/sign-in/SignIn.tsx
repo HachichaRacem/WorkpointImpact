@@ -1,8 +1,10 @@
 import React from 'react';
 import { Form, Button, Panel, Stack} from 'rsuite';
 import Brand from '@/components/Brand';
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
+  const navigate = useNavigate();
   return (
     <Stack
       justifyContent="center"
@@ -29,7 +31,7 @@ const SignUp = () => {
             <Form.Control name="name" type="password" />
           </Form.Group>
           <Form.Group style={{ display: 'flex', justifyContent: 'center' }}>
-              <Button appearance="primary">Sign in</Button>
+              <Button appearance="primary" onClick={()=> navigate('/')}>Sign in</Button>
           </Form.Group>
         </Form>
       </Panel>

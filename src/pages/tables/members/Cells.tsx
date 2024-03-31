@@ -34,21 +34,12 @@ export const CheckCell = ({
   </Cell>
 );
 
-const renderMenu = (
-  { onClose, left, top, className }: any,
-  ref,
-  setShowDrawer,
-  rowData,
-  setFormValue,
-  setIsUpdateForm
-) => {
+const renderMenu = ({ onClose, left, top, className }: any, ref) => {
   const handleSelect = eventKey => {
     if (eventKey == 2) {
-      setIsUpdateForm(true);
-      setFormValue(rowData);
-      setShowDrawer(true);
     }
     onClose();
+    console.log(eventKey);
   };
   return (
     <Popover ref={ref} className={className} style={{ left, top }} full>
@@ -63,19 +54,9 @@ const renderMenu = (
 };
 
 export const ActionCell = props => {
-  const rowData = props['rowData'];
-  const setShowDrawer = props['setShowDrawer'];
-  const setFormValue = props['setFormValue'];
-  const setIsUpdateForm = props['setIsUpdateForm'];
   return (
     <Cell {...props} className="link-group">
-      <Whisper
-        placement="autoVerticalEnd"
-        trigger="click"
-        speaker={(props, ref) => {
-          return renderMenu(props, ref, setShowDrawer, rowData, setFormValue, setIsUpdateForm);
-        }}
-      >
+      <Whisper placement="autoVerticalEnd" trigger="click" speaker={renderMenu}>
         <IconButton appearance="subtle" icon={<MoreIcon />} />
       </Whisper>
     </Cell>
