@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { Button, DatePicker, Panel, SelectPicker, Table } from 'rsuite';
 import RoutineMachine from './RoutineMachine';
@@ -6,7 +6,29 @@ import RoutineMachine from './RoutineMachine';
 const { Column, HeaderCell, Cell } = Table;
 
 const Map = () => {
-  const data = ['Member X', 'Member Y', 'Member Z'].map(item => ({ label: item, value: item }));
+  const [members, setMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+ 
+  useEffect(() => {
+  const fetchMembers = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/members'); // Assuming your backend is running locally
+      if (response.ok) {
+        const data = await response.json();
+        setMembers(data.map(member =>({label: member.fullName,value: member.id})));
+             } else {
+        console.error('Failed to fetch members');
+      }
+    } catch (error) {
+      console.error('Error fetching members:', error);
+    }
+  };
+    fetchMembers();
+  }, []);
+  const handleMemberChange = (value) => {
+    setSelectedMember(value);
+  };
+  
   const date = [
     {
       id: 1,
@@ -53,29 +75,25 @@ const Map = () => {
   ];
   return (
     <Panel>
-      <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'left', paddingBottom: 20 }}>
         <DatePicker
           format="MMM dd, yyyy"
           size="md"
           style={{ width: 200 }}
           placeholder="Select date"
         />
-        <SelectPicker
+        <SelectPicker 
           placeholder="Select member"
           size="md"
-          defaultValue="Member X"
-          data={data}
+          data={members}
+          defaultValue=""
+          value={selectedMember}
+          onChange={handleMemberChange }
           style={{ width: 180, paddingLeft: 20 }}
         />
-        <div style={{ textAlign: 'center', paddingLeft: 80 }}>
+        <div style={{ textAlign: 'center', paddingLeft: 20, paddingRight: 20 }}>
           <Button appearance="primary">Get Report</Button>
-          <Button appearance="primary" style={{ marginLeft: 20 }}>
-            Optimize
-          </Button>
-        </div>
-      </div>
-      <div style={{ textAlign: 'center', marginLeft: 20, paddingLeft: '20', paddingRight: '20' }}>
-        <div
+          <div
           style={{
             backgroundColor: 'white',
             border: '1px solid lightgray',
@@ -86,9 +104,16 @@ const Map = () => {
           }}
         >
           <div style={{ fontSize: '15px' }}>
-            <span style={{ color: 'blue' }}>Carbon Impact : </span>1300.50
+            <span style={{ color: 'blue'}}>Carbon Impact : </span>1300.50
           </div>
         </div>
+          <Button appearance="primary" style={{ marginLeft: 20 }}>
+            Optimize
+          </Button>
+        </div>
+      </div>
+      <div style={{ textAlign: 'center', marginLeft: 20, paddingLeft: '20', paddingRight: '20' }}>
+        
       </div>
       <>
         <MapContainer center={[36.8065, 10.1815]} zoom={13}>

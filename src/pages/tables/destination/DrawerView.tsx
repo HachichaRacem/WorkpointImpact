@@ -1,25 +1,52 @@
-import React from 'react';
-import { Drawer, DrawerProps, Button, Form } from 'rsuite';
+import React, { useState } from 'react';
+import { Drawer, Button, Form } from 'rsuite';
 
-const DrawerView = (props: DrawerProps) => {
-  const { onClose, ...rest } = props;
+const DrawerView = ({ setShowDrawer, isOpen }) => {
+  const [formValue,setFormValue] = useState<any>({});
+  const handleConfirmClick = async () => {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(formValue)
+    };
+    try {
+      const response = await fetch('http://localhost:4000/destinations', options);
+      if (response.ok) {
+        setShowDrawer(false);
+      } else {
+        console.log(JSON.stringify(await response.json()));
+      }
+    } catch (e) {
+      console.log('ERROR: ' + e);
+    }
+  };
+
   return (
-    <Drawer backdrop="static" size="sm" placement="right" onClose={onClose} {...rest}>
+    <Drawer
+      backdrop="static"
+      size="sm"
+      placement="right"
+      onClose={() => setShowDrawer(false)}
+      open={isOpen}
+    >
       <Drawer.Header>
         <Drawer.Title>Add a New Destination</Drawer.Title>
         <Drawer.Actions>
-          <Button onClick={onClose} appearance="primary">
+          <Button onClick={handleConfirmClick} appearance="primary">
             Confirm
           </Button>
-          <Button onClick={onClose} appearance="subtle">
+          <Button onClick={() => setShowDrawer(false)} appearance="subtle">
             Cancel
           </Button>
         </Drawer.Actions>
       </Drawer.Header>
 
       <Drawer.Body>
-        <Form fluid>
-          <Form.Group>
+      <Form onChange={setFormValue} fluid>
+        <Form.Group>
             <Form.ControlLabel>Name</Form.ControlLabel>
             <Form.Control name="name" />
           </Form.Group>
@@ -59,7 +86,7 @@ const DrawerView = (props: DrawerProps) => {
           </Form.Group>
           <Form.Group>
             <Form.ControlLabel>Latitude</Form.ControlLabel>
-            <Form.Control name="street" />
+            <Form.Control name="latitude" />
           </Form.Group>
         </Form>
       </Drawer.Body>
