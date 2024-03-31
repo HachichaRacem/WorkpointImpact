@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row, Col, Panel } from 'rsuite';
 import * as images from '../../images/charts';
 import { MapContainer, TileLayer } from 'react-leaflet';
@@ -6,6 +6,41 @@ import DataTable from './DataTable';
 import ScatterIcon from '@rsuite/icons/Scatter';
 
 const Dashboard = () => {
+  const [membersCount, setMembersCount] = useState<number>(0);
+  const [destinationsCount, setDestinationsCount] = useState<number>(0);
+  const [transportsCount, setTransportsCount] = useState<number>(0);
+  const [delegatesData, setDelegatesData] = useState<any>([]);
+
+  const loadData = async () => {
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    };
+    try {
+      const [members, transports, destinations] = await Promise.all([
+        fetch('http://localhost:3000/members', options),
+        fetch('http://localhost:3000/transports', options),
+        fetch('http://localhost:3000/destinations', options)
+      ]);
+      const [_membersData, transportsData, destinationsData] = await Promise.all([
+        members.json(),
+        transports.json(),
+        destinations.json()
+      ]);
+      setDelegatesData(_membersData);
+      setMembersCount(_membersData.length);
+      setDestinationsCount(destinationsData.length);
+      setTransportsCount(transportsData.length);
+    } catch (e) {
+      console.log('ERROR: ' + e);
+    }
+  };
+  useEffect(() => {
+    loadData();
+  });
   return (
     <>
       <Row gutter={30} className="dashboard-header">
@@ -13,30 +48,28 @@ const Dashboard = () => {
           <Panel className="trend-box bg-gradient-red">
             <img className="chart-img" src={images.PVIcon} />
             <div className="title">Total Members</div>
-            <div className="value">15</div>
+            <div className="value">{membersCount}</div>
           </Panel>
         </Col>
         <Col xs={8}>
           <Panel className="trend-box bg-gradient-green">
             <img className="chart-img" src={images.VVICon} />
             <div className="title">Total Destination</div>
-            <div className="value">280</div>
+            <div className="value">{destinationsCount}</div>
           </Panel>
         </Col>
         <Col xs={8}>
           <Panel className="trend-box bg-gradient-blue">
             <img className="chart-img" src={images.UVIcon} />
             <div className="title">Total Vehicles </div>
-            <div className="value">45</div>
+            <div className="value">{transportsCount}</div>
           </Panel>
         </Col>
       </Row>
 
-      
-
       <Row gutter={30} className="dashboard-header2">
         <Col xs={16}>
-          <DataTable />
+          <DataTable data={delegatesData} />
         </Col>
         <Col xs={8} style={{ paddingTop: 30 }}>
           <div style={{ width: '100%', backgroundColor: 'white', borderRadius: 8 }}>

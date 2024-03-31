@@ -1,5 +1,4 @@
-
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   Dropdown,
   Popover,
@@ -16,15 +15,13 @@ import NoticeIcon from '@rsuite/icons/Notice';
 import GearIcon from '@rsuite/icons/Gear';
 import HelpOutlineIcon from '@rsuite/icons/HelpOutline';
 import { FileUpload } from '@rsuite/icons';
-import { useNavigate } from 'react-router-dom';
+
 
 const renderAdminSpeaker = ({ onClose, left, top, className }: any, ref) => {
   const handleSelect = eventKey => {
     onClose();
     console.log(eventKey);
   };
-
-  const navigate = useNavigate();
   return (
     <Popover ref={ref} className={className} style={{ left, top }} full>
       <Dropdown.Menu onSelect={handleSelect}>
@@ -36,7 +33,7 @@ const renderAdminSpeaker = ({ onClose, left, top, className }: any, ref) => {
         <Dropdown.Item>Profile & account</Dropdown.Item>
         <Dropdown.Item>Feedback</Dropdown.Item>
         <Dropdown.Item divider />
-        <Dropdown.Item onClick={()=> navigate('sign-in')}>Sign out</Dropdown.Item>
+        <Dropdown.Item>Sign out</Dropdown.Item>
         <Dropdown.Item
           icon={<HelpOutlineIcon />}
           href="https://rsuitejs.com"
@@ -114,40 +111,13 @@ const renderNoticeSpeaker = ({ onClose, left, top, className }: any, ref) => {
 
 const Header = () => {
   const trigger = useRef<WhisperInstance>(null);
- 
-  const handleFileUpload = async (e) =>{
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const response = await fetch('http://localhost:4000/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      if (response.ok) {
-        console.log('File uploaded successfully');
-        // Do something if upload is successful
-      } else {
-        console.error('Error uploading file');
-        // Handle error if upload fails
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      // Handle network error
-    }
-  };
+
   return (
     <Stack className="header" spacing={8}>
        <div style={{textAlign:'center', paddingBottom: 10}}>
-       <label htmlFor="uploadInput" style={{ color: 'white', backgroundColor: '#3498ff', padding: '9px 10px', borderRadius: '5px', cursor: 'pointer' }}>Upload File
-  <input 
-    type="file" 
-    id="uploadInput" 
-    name="uploadInput"
-    onChange={handleFileUpload}
-    style={{ display: 'none' }}
-  />
-</label>
+                <IconButton icon={<FileUpload />} placement="left" appearance="primary">
+                    Upload Data
+                </IconButton>
             </div>
 
       <Whisper placement="bottomEnd" trigger="click" ref={trigger} speaker={renderNoticeSpeaker}>
@@ -168,7 +138,7 @@ const Header = () => {
         <Avatar
           size="sm"
           circle
-          src="https://avatars.githubusercontent.com/u/132157589?v=4"
+          src="https://avatars.githubusercontent.com/u/119866438?v=4"
           alt="@simonguo"
           style={{ marginLeft: 8 }}
         />

@@ -1,48 +1,66 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Drawer, Button, Form, SelectPicker } from 'rsuite';
-const DrawerView = ({ setShowDrawer, isOpen }) => {
-  const [transports, settransports] = useState([]);
-  const [selectedtransport, setSelectedtransport] = useState(null);
-  useEffect(() => {
- 
-  const fetchMembers = async () => {
-    try {
-      const respons = await fetch('http://localhost:4000/transports'); // Assuming your backend is running locally
-      if (respons.ok) {
-        const data = await respons.json();
-        settransports(data.map(transport =>({label: transport.brand})));
-             } else {
-        console.error('Failed to fetch members');
-      }
-    } catch (error) {
-      console.error('Error fetching members:', error);
-    }
-  };
-  fetchMembers();
-  },[])
-  const handleMemberChange = (value) => {
-    setSelectedtransport(value);
-  };
-  const [formValue, setFormValue] = useState<any>({});
-  const handleConfirmClick = async () => {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(formValue)
+
+const DrawerView = ({
+  setShowDrawer,
+  isOpen,
+  formValue,
+  setFormValue,
+  isUpdateForm,
+  loadUsersData,
+  transportsData
+}) => {
+  const transportsList = transportsData.map(veh => {
+    const vehName: string = veh['brand'] + veh['model'];
+    return {
+      label: vehName,
+      value: vehName
     };
-    try {
-      const response = await fetch('http://localhost:4000/members', options);
-      if (response.ok) {
-        setShowDrawer(false);
-      } else {
-        console.log(JSON.stringify(await response.json()));
+  });
+  const handleConfirmClick = async () => {
+    if (isUpdateForm) {
+      const options = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formValue)
+      };
+      try {
+        const response = await fetch('http://localhost:3000/members', options);
+        if (response.ok) {
+          await loadUsersData();
+          setShowDrawer(false);
+          console.log(JSON.stringify(await response.json()));
+        } else {
+          console.log(JSON.stringify(await response.json()));
+        }
+      } catch (e) {
+        console.log('ERROR: ' + e);
       }
-    } catch (e) {
-      console.log('ERROR: ' + e);
+    } else {
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify(formValue)
+      };
+      try {
+        const response = await fetch('http://localhost:3000/members', options);
+        if (response.ok) {
+          await loadUsersData();
+          setShowDrawer(false);
+        } else {
+          console.log(JSON.stringify(await response.json()));
+        }
+      } catch (e) {
+        console.log('ERROR: ' + e);
+      }
     }
+    setFormValue({});
   };
 
   return (
@@ -50,7 +68,10 @@ const DrawerView = ({ setShowDrawer, isOpen }) => {
       backdrop="static"
       size="sm"
       placement="right"
-      onClose={() => setShowDrawer(false)}
+      onClose={() => {
+        setFormValue({});
+        setShowDrawer(false);
+      }}
       open={isOpen}
     >
       <Drawer.Header>
@@ -59,14 +80,20 @@ const DrawerView = ({ setShowDrawer, isOpen }) => {
           <Button onClick={handleConfirmClick} appearance="primary">
             Confirm
           </Button>
-          <Button onClick={() => setShowDrawer(false)} appearance="subtle">
+          <Button
+            onClick={() => {
+              setFormValue({});
+              setShowDrawer(false);
+            }}
+            appearance="subtle"
+          >
             Cancel
           </Button>
         </Drawer.Actions>
       </Drawer.Header>
 
       <Drawer.Body>
-        <Form onChange={setFormValue} fluid>
+        <Form onChange={setFormValue} fluid formValue={formValue}>
           <Form.Group>
             <Form.ControlLabel>Full Name</Form.ControlLabel>
             <Form.Control name="fullName" />
@@ -85,7 +112,7 @@ const DrawerView = ({ setShowDrawer, isOpen }) => {
           </Form.Group>
           <Form.Group>
             <Form.ControlLabel>Assign Vehicle</Form.ControlLabel>
-            <Form.Control name="vehicle" accepter={SelectPicker} data={transports} value={selectedtransport}  onChange={handleMemberChange}/>
+            <Form.Control name="vehicle" accepter={SelectPicker} data={transportsList} />
           </Form.Group>
           <Form.Group>
             <Form.ControlLabel>Longitude Home</Form.ControlLabel>

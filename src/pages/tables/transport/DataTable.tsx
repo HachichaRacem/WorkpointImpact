@@ -1,24 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Input,
-  InputGroup,
-  Table,
-  Button,
-  DOMHelper,
-  Checkbox,
-  Stack,
-} from 'rsuite';
+import React, { useState } from 'react';
+import { Input, InputGroup, Table, Button, DOMHelper, Checkbox, Stack } from 'rsuite';
 import SearchIcon from '@rsuite/icons/Search';
 import MoreIcon from '@rsuite/icons/legacy/More';
 import DrawerView from './DrawerView';
 import { mockUsers } from '@/data/mock';
-import { NameCell, CheckCell, ActionCell } from './Cells';
+import { CheckCell, ActionCell } from './Cells';
 
 const data = mockUsers(1);
 
 const { Column, HeaderCell, Cell } = Table;
 const { getHeight } = DOMHelper;
-
 
 const DataTable = () => {
   const [showDrawer, setShowDrawer] = useState(false);
@@ -26,7 +17,7 @@ const DataTable = () => {
   const [sortColumn, setSortColumn] = useState();
   const [sortType, setSortType] = useState();
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [usersData, setUsersData] = useState<any>([]);
+
   let checked = false;
   let indeterminate = false;
 
@@ -46,7 +37,6 @@ const DataTable = () => {
     const keys = checked ? [...checkedKeys, value] : checkedKeys.filter(item => item !== value);
     setCheckedKeys(keys);
   };
-  
 
   const handleSortColumn = (sortColumn, sortType) => {
     setSortColumn(sortColumn);
@@ -83,26 +73,6 @@ const DataTable = () => {
     }
     return filtered;
   };
-  const loadUsersData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
-    try {
-      const response = await fetch('http://localhost:4000/transports', options);
-      setUsersData(await response.json());
-    } catch (e) {
-      console.log('ERROR: ' + e);
-    }
-  };
-
-  useEffect(() => {
-    loadUsersData();
-  }, []);
-
 
   return (
     <>
@@ -123,7 +93,7 @@ const DataTable = () => {
 
       <Table
         height={Math.max(getHeight(window) - 200, 400)}
-        data={usersData}
+        data={filteredData()}
         sortColumn={sortColumn}
         sortType={sortType}
         onSortColumn={handleSortColumn}
@@ -146,41 +116,45 @@ const DataTable = () => {
           </HeaderCell>
           <CheckCell dataKey="id" checkedKeys={checkedKeys} onChange={handleCheck} />
         </Column>
-        
 
         <Column minWidth={160} flexGrow={1} sortable>
           <HeaderCell>Brand</HeaderCell>
-          <NameCell dataKey="brand" />
+          <Cell dataKey="vehicleBrand" />
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
           <HeaderCell>Model</HeaderCell>
-          <NameCell dataKey="model" />
+          <Cell dataKey="vehicleModel" />
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
           <HeaderCell>Matricule</HeaderCell>
-          <NameCell dataKey="matricule" />
+          <Cell dataKey="vehicleMatricule" />
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
-          <HeaderCell>Brand</HeaderCell>
-          <NameCell dataKey="brand" />
+          <HeaderCell>Circulation Date</HeaderCell>
+          <Cell dataKey="circulationDate" />
+        </Column>
+
+        <Column minWidth={160} flexGrow={1} sortable>
+          <HeaderCell>Status</HeaderCell>
+          <Cell dataKey="status" />
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
           <HeaderCell>Fuel Type</HeaderCell>
-          <NameCell dataKey="fueltype" />
+          <Cell dataKey="vehicleFuel" />
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
           <HeaderCell>Horsepower</HeaderCell>
-          <NameCell dataKey="horspowere" />
+          <Cell dataKey="vehicleHorsepower" />
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
           <HeaderCell>Fuel Consommation 'L/KM'</HeaderCell>
-          <NameCell dataKey="fuelcons" />
+          <Cell dataKey="vehicleFuelConsumption" />
         </Column>
 
         <Column width={120}>
@@ -191,7 +165,7 @@ const DataTable = () => {
         </Column>
       </Table>
 
-      <DrawerView setShowDrawer={setShowDrawer} isOpen={showDrawer} />
+      <DrawerView open={showDrawer} onClose={() => setShowDrawer(false)} />
     </>
   );
 };

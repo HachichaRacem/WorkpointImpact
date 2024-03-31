@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Input,
   InputGroup,
@@ -20,9 +20,10 @@ const { Column, HeaderCell, Cell } = Table;
 const { getHeight } = DOMHelper;
 
 const DataTable = () => {
-  const [usersData, setUsersData] = useState([]);
   const [showDrawer, setShowDrawer] = useState(false);
   const [checkedKeys, setCheckedKeys] = useState<number[]>([]);
+  const [sortColumn, setSortColumn] = useState();
+  const [sortType, setSortType] = useState();
   const [searchKeyword, setSearchKeyword] = useState('');
 
   let checked = false;
@@ -44,31 +45,48 @@ const DataTable = () => {
     const keys = checked ? [...checkedKeys, value] : checkedKeys.filter(item => item !== value);
     setCheckedKeys(keys);
   };
-  const loadUsersData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
-    try {
-      const response = await fetch('http://localhost:4000/destinations', options);
-      setUsersData(await response.json());
-    } catch (e) {
-      console.log('ERROR: ' + e);
-    }
+
+  const handleSortColumn = (sortColumn, sortType) => {
+    setSortColumn(sortColumn);
+    setSortType(sortType);
   };
 
-  useEffect(() => {
-    loadUsersData();
-  }, []);
+  const filteredData = () => {
+    const filtered = data.filter(item => {
+      if (!item.name.includes(searchKeyword)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (sortColumn && sortType) {
+      return filtered.sort((a, b) => {
+        let x: any = a[sortColumn];
+        let y: any = b[sortColumn];
+
+        if (typeof x === 'string') {
+          x = x.charCodeAt(0);
+        }
+        if (typeof y === 'string') {
+          y = y.charCodeAt(0);
+        }
+
+        if (sortType === 'asc') {
+          return x - y;
+        } else {
+          return y - x;
+        }
+      });
+    }
+    return filtered;
+  };
 
   return (
     <>
       <Stack className="table-toolbar" justifyContent="space-between">
         <Button appearance="primary" onClick={() => setShowDrawer(true)}>
-          Add Member
+          Add Destination
         </Button>
 
         <Stack spacing={6}>
@@ -81,7 +99,13 @@ const DataTable = () => {
         </Stack>
       </Stack>
 
-      <Table height={Math.max(getHeight(window) - 200, 400)} data={usersData}>
+      <Table
+        height={Math.max(getHeight(window) - 200, 400)}
+        data={filteredData()}
+        sortColumn={sortColumn}
+        sortType={sortType}
+        onSortColumn={handleSortColumn}
+      >
         <Column width={50} align="center" fixed>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
@@ -119,17 +143,17 @@ const DataTable = () => {
 
         <Column width={300}>
           <HeaderCell>Type</HeaderCell>
-          <Cell dataKey="type" />
+          <Cell dataKey="job" />
         </Column>
 
         <Column width={300}>
           <HeaderCell>Address</HeaderCell>
-          <Cell dataKey="address" />
+          <Cell dataKey="street" />
         </Column>
 
         <Column width={150}>
           <HeaderCell>Postal Code</HeaderCell>
-          <Cell dataKey="postalcode" />
+          <Cell dataKey="postcode" />
         </Column>
 
         <Column width={150}>
@@ -145,7 +169,7 @@ const DataTable = () => {
         </Column>
       </Table>
 
-      <DrawerView setShowDrawer={setShowDrawer} isOpen={showDrawer} />
+      <DrawerView open={showDrawer} onClose={() => setShowDrawer(false)} />
     </>
   );
 };
