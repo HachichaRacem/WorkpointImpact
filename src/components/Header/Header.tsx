@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   Dropdown,
   Popover,
@@ -15,7 +15,6 @@ import {
 import NoticeIcon from '@rsuite/icons/Notice';
 import GearIcon from '@rsuite/icons/Gear';
 import HelpOutlineIcon from '@rsuite/icons/HelpOutline';
-import { FileUpload } from '@rsuite/icons';
 import { useNavigate } from 'react-router-dom';
 
 const renderAdminSpeaker = ({ onClose, left, top, className }: any, ref) => {
@@ -120,7 +119,7 @@ const Header = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const response = await fetch('http://localhost:4000/upload', {
+      const response = await fetch('http://localhost:3000/upload', {
         method: 'POST',
         body: formData,
       });
