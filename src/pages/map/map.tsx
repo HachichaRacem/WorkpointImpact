@@ -2,75 +2,92 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { Button, DatePicker, Panel, SelectPicker, Table } from 'rsuite';
 import RoutineMachine from './RoutineMachine';
+import L from 'leaflet';
+
 
 const { Column, HeaderCell, Cell } = Table;
 
 const Map = () => {
-  const [members, setMembers] = useState([]);
-  const [selectedMember, setSelectedMember] = useState(null);
- 
-  useEffect(() => {
-  const fetchMembers = async () => {
-    try {
-      const response = await fetch('http://localhost:4000/members'); // Assuming your backend is running locally
-      if (response.ok) {
-        const data = await response.json();
-        setMembers(data.map(member =>({label: member.fullName,value: member.id})));
-             } else {
-        console.error('Failed to fetch members');
+
+
+  const [] = useState([]);
+  const [points, setPoints] = useState([])
+  const loadUsersData = async () => {
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
       }
-    } catch (error) {
-      console.error('Error fetching members:', error);
+    };
+    try {
+      const response = await fetch(`http://localhost:3000/destinations`, options);
+      const responseData = await response.json(); 
+      console.log('responseData', responseData)
+      const result:any = []
+      responseData.map(point => { 
+        result.push(L.latLng(point.longitude, point.latitude) ) 
+      })
+      setPoints(result)
+      // const longitude = responseData.map(item => item.longitude); 
+      // console.log(longitude); 
+      
+      // const latitude = responseData.map(item => item.latitude);
+      // console.log(latitude);
+    } catch (e) {
+      console.log('ERROR: ' + e);
     }
   };
-    fetchMembers();
-  }, []);
-  const handleMemberChange = (value) => {
-    setSelectedMember(value);
-  };
   
+  useEffect(() => {
+    loadUsersData();
+  }, []);
+
+  
+  const data = ['Member X', 'Member Y', 'Member Z'].map(item => ({ label: item, value: item }));
   const date = [
     {
       id: 1,
       name: 'Hopital Borguiba',
-      assigned_vehicule: 'Renault Clio',
+      duration: '13 min',
+      destination : '8.0 Km',
       carburant_impact: '23,361',
-      date: '10-02-2024'
+      date: 'AM'
     },
     {
       id: 2,
       name: 'Hopital Razi',
-      assigned_vehicule: 'Renault Clio',
+      duration: 'Renault Clio',
       carburant_impact: '23,385',
-      date: '11-02-2024'
+      date: 'AM'
     },
     {
       id: 3,
       name: 'Cabinet Ghrab',
-      assigned_vehicule: 'Renault Clio',
+      duration: 'Renault Clio',
       carburant_impact: '41,256',
-      date: '12-02-2024'
+      date: 'AM'
     },
     {
       id: 4,
       name: 'Pharmacie DMK',
-      assigned_vehicule: 'Renault Clio',
+      duration: 'Renault Clio',
       carburant_impact: '10,038',
-      date: '13-02-2024'
+      date: 'PM'
     },
     {
       id: 5,
       name: 'Centre Allouche',
-      assigned_vehicule: 'Renault Clio',
+      duration: 'Renault Clio',
       carburant_impact: '1,000',
-      date: '14-02-2024'
+      date: 'PM'
     },
     {
       id: 6,
       name: 'Vetérinaire Choura',
-      assigned_vehicule: 'Renault Clio',
+      duration: 'Renault Clio',
       carburant_impact: '4,786',
-      date: '15-02-2024'
+      date: 'PM'
     }
   ];
   return (
@@ -82,13 +99,10 @@ const Map = () => {
           style={{ width: 200 }}
           placeholder="Select date"
         />
-        <SelectPicker 
+        <SelectPicker
           placeholder="Select member"
           size="md"
-          data={members}
-          defaultValue=""
-          value={selectedMember}
-          onChange={handleMemberChange }
+          data={data}
           style={{ width: 180, paddingLeft: 20 }}
         />
         <div style={{ textAlign: 'center', paddingLeft: 20, paddingRight: 20 }}>
@@ -98,6 +112,7 @@ const Map = () => {
             backgroundColor: 'white',
             border: '1px solid lightgray',
             padding: '8px',
+            marginLeft: '20px',
             borderRadius: '5px',
             marginBottom: 10,
             display: 'inline-block'
@@ -121,26 +136,48 @@ const Map = () => {
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <RoutineMachine />
+              {points.length > 0 && <RoutineMachine points={points} /> }
+          
+          
+          {/* <RoutineMachine longitude = {longitude} /> */}
         </MapContainer>
-        <Panel className="card" header="Destination by Delegate and Date ">
+        <Panel className="card" header="Destinations by Delegate and Date ">
           <Table height={300} data={date} rowKey="id">
-            <Column width={150}>
-              <HeaderCell>Destination </HeaderCell>
+            <Column width={200}>
+              <HeaderCell>Start Point </HeaderCell>
               <Cell>
                 {rowData => {
                   return <p>{rowData.name}</p>;
                 }}
               </Cell>
             </Column>
-            <Column flexGrow={1} minWidth={100}>
-              <HeaderCell>Vehicule used</HeaderCell>
+
+            <Column width={200}>
+              <HeaderCell>End Point </HeaderCell>
               <Cell>
                 {rowData => {
-                  return <p>{rowData.assigned_vehicule}</p>;
+                  return <p>{rowData.name}</p>;
+                }}
+              </Cell>
+            </Column>    
+            
+            <Column flexGrow={1} minWidth={80}>
+              <HeaderCell>Distence</HeaderCell>
+              <Cell>
+                {rowData => {
+                  return <p>{rowData.destination}</p>;
                 }}
               </Cell>
             </Column>
+
+            <Column flexGrow={1} minWidth={80}>
+              <HeaderCell>Duration</HeaderCell>
+              <Cell>
+                {rowData => {
+                  return <p>{rowData.duration}</p>;
+                }}
+              </Cell>
+            </Column>    
 
             <Column width={100}>
               <HeaderCell>Carbon Impact</HeaderCell>
@@ -148,9 +185,9 @@ const Map = () => {
             </Column>
 
             <Column width={130}>
-              <HeaderCell>Date</HeaderCell>
+              <HeaderCell>Slot</HeaderCell>
               <Cell dataKey="date" />
-            </Column>
+            </Column> 
           </Table>
         </Panel>
       </>

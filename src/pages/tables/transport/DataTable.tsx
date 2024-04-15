@@ -92,7 +92,7 @@ const DataTable = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:4000/transports', options);
+      const response = await fetch('http://localhost:3000/transports', options);
       setUsersData(await response.json());
     } catch (e) {
       console.log('ERROR: ' + e);
@@ -128,10 +128,7 @@ const DataTable = () => {
         sortType={sortType}
         onSortColumn={handleSortColumn}
       >
-        <Column width={50} align="center" fixed>
-          <HeaderCell>Id</HeaderCell>
-          <Cell dataKey="id" />
-        </Column>
+        
 
         <Column width={50} fixed>
           <HeaderCell style={{ padding: 0 }}>
