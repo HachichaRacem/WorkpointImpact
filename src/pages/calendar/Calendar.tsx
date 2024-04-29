@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import FullCalendar, { DateSelectArg, EventClickArg, EventContentArg } from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -10,6 +10,8 @@ import CalendarHeader from './CalendarHeader';
 
 const Calendar = () => {
   const [editable, setEditable] = React.useState(false);
+
+  const [users, setUsers] = useState([]);
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     console.log(selectInfo);
     setEditable(true);
@@ -20,16 +22,39 @@ const Calendar = () => {
     setEditable(true);
   };
 
-  const calendarRef = useRef(null)
+  const calendarRef = useRef(null);
 
+  const loadData = async () => {
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
+    };
+    try {
+      const response = await fetch('http://localhost:3000/members', options);
+      const usersResult = await response.json();
+
+      const fullName = usersResult.map(item => item.fullName);
+
+      setUsers(fullName);
+    } catch (e) {
+      console.log('ERROR: ' + e);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   return (
     <PageContent className="calendar-app">
-      <CalendarHeader refs={calendarRef}/>
+      <CalendarHeader refs={calendarRef} users={users} />
       <FullCalendar
         headerToolbar={false}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        ref = {calendarRef}
+        ref={calendarRef}
         initialView="dayGridMonth"
         weekends
         editable

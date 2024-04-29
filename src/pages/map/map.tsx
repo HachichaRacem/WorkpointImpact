@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer } from "react-leaflet";
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import {
   Button,
   DatePicker,
@@ -8,10 +8,27 @@ import {
   Table,
   Message,
   useToaster,
-} from "rsuite";
-import RoutineMachine from "./RoutineMachine";
-import L from "leaflet";
-import { format } from "date-fns";
+  IconButton,
+  Stack,
+  Affix,
+  Form,
+  Loader
+} from 'rsuite';
+import RoutineMachine from './RoutineMachine';
+import L from 'leaflet';
+import { format } from 'date-fns';
+import { FaCar, FaSearch } from 'react-icons/fa';
+import { GiPathDistance } from 'react-icons/gi';
+import { GoStopwatch } from 'react-icons/go';
+import './style.css';
+import { MdAccessTimeFilled } from 'react-icons/md';
+import { RiCarLine } from 'react-icons/ri';
+import { LuFuel } from 'react-icons/lu';
+import { CiCalendarDate } from 'react-icons/ci';
+import { IoSpeedometerOutline } from 'react-icons/io5';
+import { TbBrandCarbon } from 'react-icons/tb';
+import { IoMdClose } from 'react-icons/io';
+import { AiOutlineCalculator } from 'react-icons/ai';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -21,100 +38,69 @@ const Map = () => {
   const [] = useState([]);
   const [points, setPoints] = useState([]);
   const [fullNames, setFullNames] = useState([]);
-  const [selectedMember, setSelectedMembe] = useState([]);
+  const [selectedMember, setSelectedMembe] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [destinations, setDestinations] = useState([]);
+  const [showDetails, setShowDetails] = useState(false); // Nouvel état pour gérer l'affichage
+  const [distance, setDistance] = useState(null);
+  const [duration, setDuration] = useState(null);
+  const [car, setCar] = useState(null);
+  const [selectedFormula, setSelectedFormula] = useState(null);
+  const [calculationResult, setCalculationResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const formulas = [{ label: 'Carbon Impact (Distance / Consommation)', value: 'carbonImpact' }];
+
   const loadUsersData = async () => {
     const options = {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      }
     };
     try {
-      const response = await fetch(
-        `http://localhost:3000/destinations`,
-        options
-      );
-      const response1 = await fetch("http://localhost:3000/members", options);
-      const responseData = await response.json();
-      const responseData1 = await response1.json();
+      const response = await fetch('http://localhost:3000/members', options);
+      const usersResult = await response.json();
 
-      const response2 = await fetch(
-        `http://localhost:3000/schedule/${selectedMember}`
-      );
-      const responseData2 = await response2.json();
-      console.log("responseData2 : ", responseData2);
-      const destinations = responseData2.map((item) => item.Destination);
-      setDestinations(destinations);
+      const fullName = usersResult.map(item => item.fullName);
+      console.log('responseData1', usersResult);
+      console.log('FullNames', fullName);
 
-      const fullName = responseData1.map((item) => item.fullName);
-      console.log("responseData1", responseData1);
-      console.log("FullNames", fullName);
-
-      //points
-      console.log("responseData", responseData);
-      const result: any = [];
-      responseData.map((point) => {
-        result.push(L.latLng(point.longitude, point.latitude));
-      });
-
-      console.log("result", result);
-      //setPoints(result);
       setFullNames(fullName);
-      console.log("point", points);
-      // const longitude = responseData.map(item => item.longitude);
-      // console.log(longitude);
-
-      // const latitude = responseData.map(item => item.latitude);
-      // console.log(latitude);
     } catch (e) {
-      console.log("ERROR: " + e);
+      console.log('ERROR: ' + e);
     }
   };
 
   const loadSchedule = async () => {
-    const options = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    };
     try {
       if (selectedMember && selectedDate) {
         const response2 = await fetch(
-          `http://localhost:3000/schedule/${selectedMember}/${format(
-            selectedDate,
-            "yyyy-MM-dd"
-          )}`
+          `http://localhost:3000/schedule/${selectedMember}/${format(selectedDate, 'yyyy-MM-dd')}`
         );
         const responseData = await response2.json();
         const result: any = [];
-        responseData.map((point) => {
+        responseData?.points.map(point => {
           result.push(L.latLng(point.longitude, point.latitude));
         });
         setPoints(result);
+        setShowDetails(true);
+        setCar(responseData.car);
       } else {
         toaster.push(
-          <Message closable showIcon type="error" duration={7000}>
+          <Message closable showIcon type="error" duration={9000}>
             User and date are required !
           </Message>,
           {
-            placement: "topCenter",
+            placement: 'topCenter'
           }
         );
       }
-
-      
-
-      
     } catch (e) {
-      console.log("ERROR: " + e);
+      console.log('ERROR: ' + e);
     }
   };
-  console.log('points',points)
+  console.log('points', points);
 
   /*
   //destination
@@ -141,164 +127,253 @@ const Map = () => {
   const date = [
     {
       id: 1,
-      name: "Hopital Borguiba",
-      duration: "13 min",
-      destination: "8.0 Km",
-      carburant_impact: "23,361",
-      date: "AM",
+      name: 'Hopital Borguiba',
+      duration: '13 min',
+      destination: '8.0 Km',
+      carburant_impact: '23,361',
+      date: 'AM'
     },
     {
       id: 2,
-      name: "Hopital Razi",
-      duration: "Renault Clio",
-      carburant_impact: "23,385",
-      date: "AM",
+      name: 'Hopital Razi',
+      duration: 'Renault Clio',
+      carburant_impact: '23,385',
+      date: 'AM'
     },
     {
       id: 3,
-      name: "Cabinet Ghrab",
-      duration: "Renault Clio",
-      carburant_impact: "41,256",
-      date: "AM",
+      name: 'Cabinet Ghrab',
+      duration: 'Renault Clio',
+      carburant_impact: '41,256',
+      date: 'AM'
     },
     {
       id: 4,
-      name: "Pharmacie DMK",
-      duration: "Renault Clio",
-      carburant_impact: "10,038",
-      date: "PM",
+      name: 'Pharmacie DMK',
+      duration: 'Renault Clio',
+      carburant_impact: '10,038',
+      date: 'PM'
     },
     {
       id: 5,
-      name: "Centre Allouche",
-      duration: "Renault Clio",
-      carburant_impact: "1,000",
-      date: "PM",
+      name: 'Centre Allouche',
+      duration: 'Renault Clio',
+      carburant_impact: '1,000',
+      date: 'PM'
     },
     {
       id: 6,
-      name: "Vetérinaire Choura",
-      duration: "Renault Clio",
-      carburant_impact: "4,786",
-      date: "PM",
-    },
+      name: 'Vetérinaire Choura',
+      duration: 'Renault Clio',
+      carburant_impact: '4,786',
+      date: 'PM'
+    }
   ];
+
+  const handleClosePanel = () => {
+    setShowDetails(false);
+  };
+
+  const calculateResult = (distance, fuelConsumption) => {
+    setLoading(true);
+    if (selectedFormula === 'carbonImpact') {
+      const result = (distance / 100) * fuelConsumption;
+      setCalculationResult(parseFloat(result.toFixed(3)));
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (selectedFormula && distance && car?.fuelcons) {
+      calculateResult(distance, car.fuelcons);
+    }
+  }, [selectedFormula, distance, car]);
+
   return (
     <Panel>
-      <div
-        style={{ display: "flex", justifyContent: "left", paddingBottom: 20 }}
-      >
+      {/* <Affix>
+        <Stack
+          spacing={20}
+          // justifyContent="space-between"
+          // ref={containerRef}
+          style={{
+            position: 'relative',
+            background: '#fff',
+            marginBottom: 20,
+            padding: 4,
+            borderRadius: 6,
+            boxShadow: '0 0 15px 0 rgb(0 0 0 / 5%)'
+          }}
+        >
+          <DatePicker
+            appearance="subtle"
+            format="dd-MM-yyyy"
+            size="md"
+            style={{ width: 200 }}
+            placeholder="Select date"
+            value={selectedDate || undefined} // Set the value of the DatePicker
+            onChange={date => setSelectedDate(date)} // Update selected date on change
+          />
+
+          <SelectPicker
+            appearance="subtle"
+            placeholder="Select member"
+            size="md"
+            style={{ width: 200 }}
+            data={fullNames.map(name => ({ label: name, value: name }))}
+            onChange={value => setSelectedMembe(value)} // Update selected member on change
+          />
+
+          <IconButton icon={<FaSearch />} appearance="primary" onClick={loadSchedule} />
+        </Stack>
+
+      </Affix> */}
+      <Stack spacing={20} style={{ marginLeft: 20 }}>
         <DatePicker
-          format="MMM dd, yyyy"
+          format="dd-MM-yyyy"
           size="md"
           style={{ width: 200 }}
           placeholder="Select date"
           value={selectedDate || undefined} // Set the value of the DatePicker
-          onChange={(date) => setSelectedDate(date)} // Update selected date on change
+          onChange={date => setSelectedDate(date)} // Update selected date on change
         />
 
         <SelectPicker
           placeholder="Select member"
           size="md"
-          data={fullNames.map((name) => ({ label: name, value: name }))}
-          style={{ width: 180, paddingLeft: 20 }}
-          onChange={(value) => setSelectedMembe(value)} // Update selected member on change
+          data={fullNames.map(name => ({ label: name, value: name }))}
+          onChange={value => setSelectedMembe(value)} // Update selected member on change
+          style={{ width: 200 }}
         />
 
-        <Button appearance="primary" onClick={loadSchedule}>
-          Get Destinations
-        </Button>
-
-        <div style={{ textAlign: "center", paddingLeft: 20, paddingRight: 20 }}>
+        <IconButton icon={<FaSearch />} appearance="primary" onClick={loadSchedule} />
+        {/* <Button appearance="primary" onClick={loadSchedule}>
+          <FaSearch />
+        </Button> */}
+        {/* 
+        <div style={{ textAlign: 'center', paddingLeft: 20, paddingRight: 20 }}>
           <Button appearance="primary">Get Report</Button>
           <div
             style={{
-              backgroundColor: "white",
-              border: "1px solid lightgray",
-              padding: "8px",
-              marginLeft: "20px",
-              borderRadius: "5px",
+              backgroundColor: 'white',
+              border: '1px solid lightgray',
+              padding: '8px',
+              marginLeft: '20px',
+              borderRadius: '5px',
               marginBottom: 10,
-              display: "inline-block",
+              display: 'inline-block'
             }}
           >
-            <div style={{ fontSize: "15px" }}>
-              <span style={{ color: "blue" }}>Carbon Impact : </span>1300.50
+            <div style={{ fontSize: '15px' }}>
+              <span style={{ color: 'blue' }}>Carbon Impact : </span>1300.50
             </div>
           </div>
           <Button appearance="primary" style={{ marginLeft: 20 }}>
             Optimize
           </Button>
-        </div>
-      </div>
+        </div> */}
+      </Stack>
+      {/* <div
+        style={{
+          textAlign: 'center',
+          marginLeft: 20,
+          paddingLeft: '20',
+          paddingRight: '20'
+        }}
+      ></div> */}
+
       <div
         style={{
-          textAlign: "center",
+          display: 'flex',
+          justifyContent: 'space-between',
           marginLeft: 20,
-          paddingLeft: "20",
-          paddingRight: "20",
+          paddingLeft: '20',
+          paddingRight: '20',
+          marginTop: 20
         }}
-      ></div>
-      <>
+      >
         <MapContainer center={[36.8065, 10.1815]} zoom={13}>
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          {points.length > 0 && <RoutineMachine points={points} />}
+          {points.length > 0 && (
+            <RoutineMachine points={points} setDuration={setDuration} setDistance={setDistance} />
+          )}
 
           {/* <RoutineMachine longitude = {longitude} /> */}
         </MapContainer>
-        <Panel className="card" header="Destinations by Delegate and Date ">
-          <Table height={300} data={date} rowKey="id">
-            <Column width={200}>
-              <HeaderCell>Start Point </HeaderCell>
-              <Cell>
-                {(rowData) => {
-                  return <p>{rowData.name}</p>;
-                }}
-              </Cell>
-            </Column>
 
-            <Column width={200}>
-              <HeaderCell>End Point </HeaderCell>
-              <Cell>
-                {(rowData) => {
-                  return <p>{rowData.name}</p>;
-                }}
-              </Cell>
-            </Column>
+        {/* {showDetails && ( */}
+        <Panel
+          // header="Details "
+          style={{ marginLeft: '20px', width: showDetails ? '400px' : 0, marginTop: 0 }}
+          className={`card ${showDetails ? 'slide-in' : 'slide-out'}`}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <h6 className="title">Details</h6>
 
-            <Column flexGrow={1} minWidth={80}>
-              <HeaderCell>Distence</HeaderCell>
-              <Cell>
-                {(rowData) => {
-                  return <p>{rowData.destination}</p>;
-                }}
-              </Cell>
-            </Column>
-
-            <Column flexGrow={1} minWidth={80}>
-              <HeaderCell>Duration</HeaderCell>
-              <Cell>
-                {(rowData) => {
-                  return <p>{rowData.duration}</p>;
-                }}
-              </Cell>
-            </Column>
-
-            <Column width={100}>
-              <HeaderCell>Carbon Impact</HeaderCell>
-              <Cell dataKey="carburant_impact" />
-            </Column>
-
-            <Column width={130}>
-              <HeaderCell>Slot</HeaderCell>
-              <Cell dataKey="date" />
-            </Column>
-          </Table>
+            <IconButton
+              color="red"
+              icon={<IoMdClose />}
+              appearance="link"
+              onClick={handleClosePanel}
+            />
+          </div>
+          <Stack
+            justifyContent="flex-start"
+            direction="row"
+            alignItems="flex-start"
+            spacing={40}
+            wrap
+            style={{ marginTop: 50 }}
+          >
+            <p title="Distance">
+              <GiPathDistance size={18} /> {distance} km
+            </p>
+            <p title="Duration">
+              {' '}
+              <GoStopwatch /> {duration} min
+            </p>
+            <p title="Car">
+              {' '}
+              <RiCarLine /> {`${car?.brand} ${car?.model}`}
+            </p>
+            <p title="Fuel">
+              <LuFuel /> {car?.fueltype}
+            </p>
+            <p title="Consumption">
+              <IoSpeedometerOutline /> {car?.fuelcons} {' l/100km'}
+            </p>
+            <p title="Date of entry into circulation">
+              <CiCalendarDate /> {car?.circulationDate?.toLocaleString()?.substring(0, 10)}
+            </p>
+            <Stack>
+              <Form.Group controlId="password-7">
+                <Form.ControlLabel>
+                  <Stack spacing={2}>
+                    <AiOutlineCalculator />
+                    <p style={{ marginBottom: 3 }}>Carbon Impact Formulas</p>
+                  </Stack>
+                </Form.ControlLabel>
+                <SelectPicker
+                  data={formulas.map(formula => ({ label: formula.label, value: formula.value }))}
+                  onChange={value => setSelectedFormula(value)}
+                  placeholder="Select formula"
+                  style={{ width: 224, marginTop: 5 }}
+                />
+              </Form.Group>
+            </Stack>
+            {loading && <Loader content="calculating..." vertical />}
+            {calculationResult && (
+              <p title="Carbon emission">
+                <TbBrandCarbon /> {calculationResult} kg CO2eq
+              </p>
+            )}
+          </Stack>
         </Panel>
-      </>
+        {/* )} */}
+      </div>
     </Panel>
   );
 };
