@@ -3,7 +3,7 @@ import React from 'react';
 import { useState } from 'react';
 import { Button, IconButton, SelectPicker } from 'rsuite';
 
-const CalendarHeader = ({ refs, users }) => {
+const CalendarHeader = ({ refs, users, setUser, user, setLoading }) => {
   const months = [
     'January',
     'February',
@@ -46,6 +46,17 @@ const CalendarHeader = ({ refs, users }) => {
 
   return (
     <div>
+      <SelectPicker
+        placeholder="Select member"
+        size="md"
+        data={data}
+        style={{ width: 220, paddingTop: 3, marginBottom: 30 }}
+        onChange={value => {
+          setUser(value);
+          setLoading(true);
+        }}
+        value={user}
+      />
       <div
         style={{
           display: 'flex',
@@ -59,13 +70,6 @@ const CalendarHeader = ({ refs, users }) => {
             <IconButton icon={<ArrowLeftLine />} onClick={() => prevHandle()} size="lg" />
             <IconButton icon={<ArrowRightLine />} onClick={() => nextHandle()} size="lg" />
           </div>
-          <SelectPicker
-            placeholder="Select member"
-            size="md"
-            defaultValue="Member X"
-            data={data}
-            style={{ width: 180, paddingLeft: 20, paddingTop: 3 }}
-          />
         </div>
         <h3 style={{ textAlign: 'center', paddingRight: 100 }} id="title">
           {title}

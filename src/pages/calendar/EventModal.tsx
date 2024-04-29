@@ -5,53 +5,63 @@ interface EventModalProps extends ModalProps {
   onAddEvent: (event: React.MouseEvent) => void;
 }
 
-const EventModal = (props: EventModalProps) => {
-  const { onClose, open, onAddEvent, ...rest } = props;
+const EventModal = props => {
+  const { onClose, open, onAddEvent, eventInfo, ...rest } = props;
+
   return (
     <Modal open={open} onClose={onClose} backdrop="static" {...rest}>
       <Modal.Header>
-        <Modal.Title>Add a New Event</Modal.Title>
+        <Modal.Title>Details</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form fluid>
           <Form.Group controlId="name">
-            <Form.ControlLabel>Event Name</Form.ControlLabel>
-            <Form.Control name="name" />
+            <Form.ControlLabel>Destination</Form.ControlLabel>
+            <Form.Control name="name" value={eventInfo?.title} />
           </Form.Group>
           <Form.Group controlId="description">
-            <Form.ControlLabel>Event Description</Form.ControlLabel>
-            <Form.Control name="description" />
+            <Form.ControlLabel>Location</Form.ControlLabel>
+            <Form.Control name="description" value={eventInfo?.address} />
           </Form.Group>
-          <Form.Group controlId="location">
-            <Form.ControlLabel>Event Location</Form.ControlLabel>
-            <Form.Control name="location" />
-          </Form.Group>
+
           <Form.Group controlId="start">
-            <Form.ControlLabel>Event Date</Form.ControlLabel>
+            <Form.ControlLabel>Date</Form.ControlLabel>
             <Stack spacing={6}>
               <DatePicker
                 format="yyyy-MM-dd HH:mm:ss"
                 block
                 style={{ width: 200 }}
                 placeholder="Start Date"
+                value={eventInfo?.start && new Date(eventInfo?.start)}
+                readOnly
               />
               <DatePicker
                 format="yyyy-MM-dd HH:mm:ss"
                 block
                 style={{ width: 200 }}
                 placeholder="End Date"
+                value={eventInfo?.end && new Date(eventInfo?.end)}
+                readOnly
               />
-              <Checkbox>All Day</Checkbox>
+
+              {/* <Checkbox>All Day</Checkbox> */}
             </Stack>
+          </Form.Group>
+          <Form.Group controlId="description">
+            <Form.ControlLabel>Car</Form.ControlLabel>
+            <Form.Control
+              name="description"
+              value={`${eventInfo?.car?.brand} ${eventInfo?.car?.model}`}
+            />
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onAddEvent} appearance="primary">
+        {/* <Button onClick={onAddEvent} appearance="primary">
           Submit
-        </Button>
+        </Button> */}
         <Button onClick={onClose} appearance="subtle">
-          Cancel
+          Close
         </Button>
       </Modal.Footer>
     </Modal>
