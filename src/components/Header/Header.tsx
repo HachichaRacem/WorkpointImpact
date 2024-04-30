@@ -119,7 +119,7 @@ const Header = () => {
     const formData = new FormData();
     formData.append('file', file);
     try {
-      const response = await fetch('http://localhost:3000/upload', {
+      const response = await fetch('http://51.210.242.227:5200/upload', {
         method: 'POST',
         body: formData,
       });

@@ -11,7 +11,7 @@ const DrawerView = ({
   transportsData
 }) => {
   const transportsList = transportsData.map(veh => {
-    const vehName: string = veh['brand'] + veh['model'];
+    const vehName: string = veh['brand'] + veh['model'] + veh['matricule'];
     return {
       label: vehName,
       value: vehName
@@ -28,7 +28,7 @@ const DrawerView = ({
         body: JSON.stringify(formValue)
       };
       try {
-        const response = await fetch('http://localhost:3000/members', options);
+        const response = await fetch('http://51.210.242.227:5200/members', options);
         if (response.ok) {
           await loadUsersData();
           setShowDrawer(false);
@@ -49,7 +49,7 @@ const DrawerView = ({
         body: JSON.stringify(formValue)
       };
       try {
-        const response = await fetch('http://localhost:3000/members', options);
+        const response = await fetch('http://51.210.242.227:5200/members', options);
         if (response.ok) {
           await loadUsersData();
           setShowDrawer(false);

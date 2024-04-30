@@ -48,7 +48,7 @@ const Map = () => {
   const [calculationResult, setCalculationResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const formulas = [{ label: 'Carbon Impact (Distance / Consommation)', value: 'carbonImpact' }];
+  const formulas = [{ label: 'Carbon Emission (Distance / Consumption)', value: 'carbonImpact' }];
 
   const loadUsersData = async () => {
     const options = {
@@ -59,7 +59,7 @@ const Map = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:3000/members', options);
+      const response = await fetch('http://51.210.242.227:5200/members', options);
       const usersResult = await response.json();
 
       const fullName = usersResult.map(item => item.fullName);
@@ -76,7 +76,7 @@ const Map = () => {
     try {
       if (selectedMember && selectedDate) {
         const response2 = await fetch(
-          `http://localhost:3000/schedule/${selectedMember}/${format(selectedDate, 'yyyy-MM-dd')}`
+          `http://51.210.242.227:5200/schedule/${selectedMember}/${format(selectedDate, 'yyyy-MM-dd')}`
         );
         const responseData = await response2.json();
         const result: any = [];
@@ -106,7 +106,7 @@ const Map = () => {
   //destination
   const fetchDestinations = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/schedule?user=${selectedMember}`);
+      const response = await fetch(`http://51.210.242.227:5200/schedule?user=${selectedMember}`);
       const responseData = await response.json();
       const destinations = responseData.map(item => item.destination);
       setDestinations(destinations);

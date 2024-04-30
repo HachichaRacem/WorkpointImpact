@@ -60,7 +60,7 @@ const DrawerView = ({ setShowDrawer, isOpen }) => {
             </Form.Group>
           </Stack>
           <Form.Group>
-            <Form.ControlLabel>Matricule</Form.ControlLabel>
+            <Form.ControlLabel>Registration Number</Form.ControlLabel>
             <Form.Control name="matricule"  />
           </Form.Group>
           <Form.Group>
@@ -72,7 +72,7 @@ const DrawerView = ({ setShowDrawer, isOpen }) => {
             <Form.Control name="horspowere" />
           </Form.Group>
           <Form.Group>
-            <Form.ControlLabel>Fuel Consommation 'L/KM'</Form.ControlLabel>
+            <Form.ControlLabel>Fuel Consumption 'L/KM'</Form.ControlLabel>
             <Form.Control name="fuelcons" />
           </Form.Group>
 

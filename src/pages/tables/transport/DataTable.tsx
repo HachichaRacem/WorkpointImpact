@@ -92,7 +92,7 @@ const DataTable = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:3000/transports', options);
+      const response = await fetch('http://51.210.242.227:5200/transports', options);
       setUsersData(await response.json());
     } catch (e) {
       console.log('ERROR: ' + e);
@@ -156,7 +156,7 @@ const DataTable = () => {
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
-          <HeaderCell>Matricule</HeaderCell>
+          <HeaderCell>Registration Number</HeaderCell>
           <NameCell dataKey="matricule" />
         </Column>
 
@@ -176,7 +176,7 @@ const DataTable = () => {
         </Column>
 
         <Column minWidth={160} flexGrow={1} sortable>
-          <HeaderCell>Fuel Consommation 'L/KM'</HeaderCell>
+          <HeaderCell>Fuel Consumption 'L/KM'</HeaderCell>
           <NameCell dataKey="fuelcons" />
         </Column>
 

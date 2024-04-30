@@ -44,7 +44,7 @@ const Calendar = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:3000/members', options);
+      const response = await fetch('http://51.210.242.227:5200/members', options);
       const usersResult = await response.json();
 
       const fullName = usersResult.map(item => item.fullName);
@@ -73,7 +73,7 @@ const Calendar = () => {
   const todayStr = format(today, 'yyyy-MM-dd');
 
   const fetchScheduleUser = async () => {
-    const response = await fetch(`http://localhost:3000/schedule/${user}`);
+    const response = await fetch(`http://51.210.242.227:5200/schedule/${user}`);
     const result = await response.json();
     const res = result.map(item => ({
       id: item._id,

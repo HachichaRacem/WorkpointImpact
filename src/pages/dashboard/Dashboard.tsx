@@ -21,9 +21,9 @@ const Dashboard = () => {
     };
     try {
       const [members, transports, destinations] = await Promise.all([
-        fetch('http://localhost:3000/members', options),
-        fetch('http://localhost:3000/transports', options),
-        fetch('http://localhost:3000/destinations', options)
+        fetch('http://51.210.242.227:5200/members', options),
+        fetch('http://51.210.242.227:5200/transports', options),
+        fetch('http://51.210.242.227:5200/destinations', options)
       ]);
       const [_membersData, transportsData, destinationsData] = await Promise.all([
         members.json(),

@@ -53,7 +53,7 @@ const DataTable = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:3000/destinations', options);
+      const response = await fetch('http://51.210.242.227:5200/destinations', options);
       setUsersData(await response.json());
     } catch (e) {
       console.log('ERROR: ' + e);

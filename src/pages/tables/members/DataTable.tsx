@@ -46,7 +46,7 @@ const DataTable = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:3000/members', options);
+      const response = await fetch('http://51.210.242.227:5200/members', options);
       const data = await response.json();
       setUsersData(data);
     } catch (e) {
@@ -62,7 +62,7 @@ const DataTable = () => {
       }
     };
     try {
-      const response = await fetch('http://localhost:3000/transports', options);
+      const response = await fetch('http://51.210.242.227:5200/transports', options);
       const data = await response.json();
       setTransportsData(data);
     } catch (e) {

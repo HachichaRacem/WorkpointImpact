@@ -13,7 +13,7 @@ const DrawerView = ({ setShowDrawer, isOpen }) => {
       body: JSON.stringify(formValue)
     };
     try {
-      const response = await fetch('http://localhost:3000/destinations', options);
+      const response = await fetch('http://51.210.242.227:5200/destinations', options);
       if (response.ok) {
         setShowDrawer(false);
       } else {
