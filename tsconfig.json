@@ -17,8 +17,23 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "resolveJsonModule": true,
+    "outDir": "build",
+    "checkJs": false
   },
-  "exclude": ["node_modules"],
-  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+  "exclude": ["node_modules", "build/**/*"],
+  "include": [
+    "./src/**/*.tss",
+    "./src/**/*.tsx",
+    "./src/**/*.json",
+    "./src/index.d.ts",
+    "./src/**/*.js",
+    "./src/**/*.jsx",
+    "src/services/auth.service.ts",
+    "src/Types/types.ts",
+    "src/store.ts",
+    "src/reducers/reducers.ts",
+    "src/constants.js.ts"
+  ]
 }

@@ -4,12 +4,12 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import PageContent from '@/components/PageContent';
-import { INITIAL_EVENTS } from './event-utils';
 import EventModal from './EventModal';
 import CalendarHeader from './CalendarHeader';
-import { addDays, format, startOfMonth } from 'date-fns';
-import { uniqueId } from 'lodash';
+import { format } from 'date-fns';
 import { Loader } from 'rsuite';
+import { getScheduleByUser } from '@/services/schedule.service';
+import { getMembers } from '@/services/member.service';
 
 const Calendar = () => {
   const [editable, setEditable] = React.useState(false);
@@ -36,17 +36,8 @@ const Calendar = () => {
   const calendarRef = useRef(null);
 
   const loadData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
     try {
-      const response = await fetch('http://51.210.242.227:5200/members', options);
-      const usersResult = await response.json();
-
+      const usersResult = await getMembers();
       const fullName = usersResult.map(item => item.fullName);
 
       setUsers(fullName);
@@ -68,13 +59,9 @@ const Calendar = () => {
     }
   }, [user]);
 
-  const today = new Date();
-  const firstDay = startOfMonth(today);
-  const todayStr = format(today, 'yyyy-MM-dd');
-
   const fetchScheduleUser = async () => {
-    const response = await fetch(`http://51.210.242.227:5200/schedule/${user}`);
-    const result = await response.json();
+    const result = await getScheduleByUser(user);
+
     const res = result.map(item => ({
       id: item._id,
       title: item.destination?.name,
@@ -117,7 +104,7 @@ const Calendar = () => {
         events={data}
         initialEvents={data}
         select={handleDateSelect}
-        eventContent={renderEventContent} // custom render function
+        eventContent={renderEventContent}
         eventClick={handleEventClick}
       />
       <EventModal

@@ -37,6 +37,7 @@ const createRoutineMachineLayer = props => {
   instance.on('routesfound', function (e) {
     var routes = e.routes;
     var summary = routes[0].summary;
+    console.log('🚀 ~ summary:', summary);
     setDistance(summary.totalDistance / 1000);
     setDuration(Math.round((summary.totalTime % 3600) / 60));
     // alert distance and time in km and minutes

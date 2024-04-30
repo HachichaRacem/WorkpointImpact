@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
+// import { MapContainer, TileLayer } from 'react-leaflet';
 import {
   Button,
   DatePicker,
@@ -29,8 +29,9 @@ import { IoSpeedometerOutline } from 'react-icons/io5';
 import { TbBrandCarbon } from 'react-icons/tb';
 import { IoMdClose } from 'react-icons/io';
 import { AiOutlineCalculator } from 'react-icons/ai';
-
-const { Column, HeaderCell, Cell } = Table;
+import { getMembers } from '@/services/member.service';
+import { getScheduleByUserDate } from '@/services/schedule.service';
+import MapComponent from './MapComponent';
 
 const Map = () => {
   const toaster = useToaster();
@@ -47,24 +48,15 @@ const Map = () => {
   const [selectedFormula, setSelectedFormula] = useState(null);
   const [calculationResult, setCalculationResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [destinations, setDestinations] = useState([]);
 
   const formulas = [{ label: 'Carbon Emission (Distance / Consumption)', value: 'carbonImpact' }];
 
   const loadUsersData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
     try {
-      const response = await fetch('http://51.210.242.227:5200/members', options);
-      const usersResult = await response.json();
+      const usersResult = await getMembers();
 
       const fullName = usersResult.map(item => item.fullName);
-      console.log('responseData1', usersResult);
-      console.log('FullNames', fullName);
 
       setFullNames(fullName);
     } catch (e) {
@@ -75,18 +67,23 @@ const Map = () => {
   const loadSchedule = async () => {
     try {
       if (selectedMember && selectedDate) {
-        const response2 = await fetch(
-          `http://51.210.242.227:5200/schedule/${selectedMember}/${format(
-            selectedDate,
-            'yyyy-MM-dd'
-          )}`
+        const responseData = await getScheduleByUserDate(
+          selectedMember,
+          format(selectedDate, 'yyyy-MM-dd')
         );
-        const responseData = await response2.json();
+
+        const sortedResult = responseData?.schedule?.sort((a, b) => {
+          return a.sequence - b.sequence;
+        });
+
+        console.log('🚀 ~ loadSchedule ~ sortedResult:', sortedResult);
+
         const result: any = [];
-        responseData?.points.map(point => {
-          result.push(L.latLng(point.longitude, point.latitude));
+        responseData?.schedule.map(point => {
+          result.push(L.latLng(point.Destination.latitude, point.Destination.longitude));
         });
         setPoints(result);
+        setDestinations(responseData?.schedule);
         setShowDetails(true);
         setCar(responseData.car);
       } else {
@@ -103,7 +100,6 @@ const Map = () => {
       console.log('ERROR: ' + e);
     }
   };
-  console.log('points', points);
 
   /*
   //destination
@@ -121,57 +117,6 @@ const Map = () => {
   useEffect(() => {
     loadUsersData();
   }, []);
-
-  /*function handleSelect(event){
-    setValue(event?.target.value);
-    console.log("value",value);
-  }*/
-
-  const date = [
-    {
-      id: 1,
-      name: 'Hopital Borguiba',
-      duration: '13 min',
-      destination: '8.0 Km',
-      carburant_impact: '23,361',
-      date: 'AM'
-    },
-    {
-      id: 2,
-      name: 'Hopital Razi',
-      duration: 'Renault Clio',
-      carburant_impact: '23,385',
-      date: 'AM'
-    },
-    {
-      id: 3,
-      name: 'Cabinet Ghrab',
-      duration: 'Renault Clio',
-      carburant_impact: '41,256',
-      date: 'AM'
-    },
-    {
-      id: 4,
-      name: 'Pharmacie DMK',
-      duration: 'Renault Clio',
-      carburant_impact: '10,038',
-      date: 'PM'
-    },
-    {
-      id: 5,
-      name: 'Centre Allouche',
-      duration: 'Renault Clio',
-      carburant_impact: '1,000',
-      date: 'PM'
-    },
-    {
-      id: 6,
-      name: 'Vetérinaire Choura',
-      duration: 'Renault Clio',
-      carburant_impact: '4,786',
-      date: 'PM'
-    }
-  ];
 
   const handleClosePanel = () => {
     setShowDetails(false);
@@ -295,7 +240,7 @@ const Map = () => {
           marginTop: 20
         }}
       >
-        <MapContainer center={[36.8065, 10.1815]} zoom={13}>
+        {/* <MapContainer center={[36.8065, 10.1815]} zoom={13}>
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -304,8 +249,14 @@ const Map = () => {
             <RoutineMachine points={points} setDuration={setDuration} setDistance={setDistance} />
           )}
 
-          {/* <RoutineMachine longitude = {longitude} /> */}
-        </MapContainer>
+        </MapContainer> */}
+
+        <MapComponent
+          destinations={destinations}
+          points={points}
+          setDuration={setDuration}
+          setDistance={setDistance}
+        />
 
         {/* {showDetails && ( */}
         <Panel
