@@ -111,7 +111,6 @@ const DataTable = () => {
         </Stack>
 
         <Table height={Math.max(getHeight(window) - 200, 400)} data={usersData}>
-          
           <Column width={50} fixed>
             <HeaderCell style={{ padding: 0 }}>
               <div style={{ lineHeight: '40px' }}>
@@ -148,7 +147,16 @@ const DataTable = () => {
 
           <Column width={300}>
             <HeaderCell>Assigned Vehicle</HeaderCell>
-            <Cell dataKey="vehicle" />
+            {/* <Cell dataKey="vehicle" /> */}
+            <Cell>
+              {rowData => {
+                return (
+                  <p>
+                    {rowData.vehicle?.brand} {rowData.vehicle?.model} {rowData.vehicle?.matricule}
+                  </p>
+                );
+              }}
+            </Cell>
           </Column>
 
           <Column width={120}>

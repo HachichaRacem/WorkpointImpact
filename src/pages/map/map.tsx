@@ -41,8 +41,8 @@ const Map = () => {
   const [selectedMember, setSelectedMembe] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDetails, setShowDetails] = useState(false); // Nouvel état pour gérer l'affichage
-  const [distance, setDistance] = useState(null);
-  const [duration, setDuration] = useState(null);
+  const [distance, setDistance] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [car, setCar] = useState(null);
   const [selectedFormula, setSelectedFormula] = useState(null);
   const [calculationResult, setCalculationResult] = useState(null);
@@ -76,7 +76,10 @@ const Map = () => {
     try {
       if (selectedMember && selectedDate) {
         const response2 = await fetch(
-          `http://51.210.242.227:5200/schedule/${selectedMember}/${format(selectedDate, 'yyyy-MM-dd')}`
+          `http://51.210.242.227:5200/schedule/${selectedMember}/${format(
+            selectedDate,
+            'yyyy-MM-dd'
+          )}`
         );
         const responseData = await response2.json();
         const result: any = [];
@@ -320,6 +323,12 @@ const Map = () => {
               onClick={handleClosePanel}
             />
           </div>
+
+          {points.length == 0 && (
+            <Message showIcon type="warning">
+              No route found for this date
+            </Message>
+          )}
           <Stack
             justifyContent="flex-start"
             direction="row"

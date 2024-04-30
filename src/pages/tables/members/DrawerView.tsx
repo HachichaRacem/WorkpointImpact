@@ -63,6 +63,8 @@ const DrawerView = ({
     setFormValue({});
   };
 
+  console.log('formValue', formValue);
+
   return (
     <Drawer
       backdrop="static"
@@ -112,7 +114,18 @@ const DrawerView = ({
           </Form.Group>
           <Form.Group>
             <Form.ControlLabel>Assign Vehicle</Form.ControlLabel>
-            <Form.Control name="vehicle" accepter={SelectPicker} data={transportsList} />
+            <Form.Control
+              name="vehicle"
+              value={
+                formValue.vehicle
+                  ? formValue.vehicle?.brand +
+                    formValue.vehicle?.model +
+                    formValue.vehicle?.matricule
+                  : null
+              }
+              accepter={SelectPicker}
+              data={transportsList}
+            />
           </Form.Group>
           <Form.Group>
             <Form.ControlLabel>Longitude Home</Form.ControlLabel>
