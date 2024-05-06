@@ -1,5 +1,6 @@
 import React from 'react';
 import { Drawer, Button, Form, SelectPicker } from 'rsuite';
+import {updateMember,addMember} from '@/services/member.service'
 
 const DrawerView = ({
   setShowDrawer,
@@ -19,20 +20,22 @@ const DrawerView = ({
   });
   const handleConfirmClick = async () => {
     if (isUpdateForm) {
-      const options = {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        body: JSON.stringify(formValue)
-      };
+      // const options = {
+      //   method: 'PATCH',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Accept: 'application/json'
+      //   },
+      //   body: JSON.stringify(formValue)
+
+      // };
       try {
-        const response = await fetch('http://51.210.242.227:5200/members', options);
+        console.log('hmhmhm',JSON.stringify(formValue))
+        console.log('kkk',formValue['_id'])
+        const response = await updateMember(formValue['_id'],formValue);
         if (response.ok) {
           await loadUsersData();
           setShowDrawer(false);
-          console.log(JSON.stringify(await response.json()));
         } else {
           console.log(JSON.stringify(await response.json()));
         }
@@ -40,16 +43,16 @@ const DrawerView = ({
         console.log('ERROR: ' + e);
       }
     } else {
-      const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json'
-        },
-        body: JSON.stringify(formValue)
-      };
+      // const options = {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Accept: 'application/json'
+      //   },
+      //   body: JSON.stringify(formValue)
+      // };
       try {
-        const response = await fetch('http://51.210.242.227:5200/members', options);
+        const response = await addMember(formValue);
         if (response.ok) {
           await loadUsersData();
           setShowDrawer(false);

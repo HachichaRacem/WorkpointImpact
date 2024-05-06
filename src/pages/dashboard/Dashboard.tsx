@@ -4,6 +4,9 @@ import * as images from '../../images/charts';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import DataTable from './DataTable';
 import ScatterIcon from '@rsuite/icons/Scatter';
+import { getMembers } from '@/services/member.service';
+import {getVehicule}from '@/services/vehicle.service'
+import{getDestination} from '@/services/destination.service'
 
 const Dashboard = () => {
   const [membersCount, setMembersCount] = useState<number>(0);
@@ -11,7 +14,7 @@ const Dashboard = () => {
   const [transportsCount, setTransportsCount] = useState<number>(0);
   const [delegatesData, setDelegatesData] = useState<any>([]);
 
-  const loadData = async () => {
+  /*const loadData = async () => {
     const options = {
       method: 'GET',
       headers: {
@@ -37,7 +40,26 @@ const Dashboard = () => {
     } catch (e) {
       console.log('ERROR: ' + e);
     }
+  };*/
+
+  const loadData = async () => {
+    try {
+      const usersResult = await getMembers();
+      setMembersCount(usersResult.length);
+      setDelegatesData(usersResult);
+      
+      const transportsResult = await getVehicule();
+      setTransportsCount(transportsResult.length);
+
+      const destinationResult = await getDestination();
+      setDestinationsCount(destinationResult.length);
+
+
+    } catch (e) {
+      console.log('ERROR: ' + e);
+    }
   };
+
   useEffect(() => {
     loadData();
   });
@@ -145,3 +167,4 @@ const Dashboard = () => {
   );
 };
 export default Dashboard;
+

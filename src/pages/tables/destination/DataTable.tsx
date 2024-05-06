@@ -7,12 +7,16 @@ import {
   DOMHelper,
   Checkbox,
   Stack,
+  useToaster,
+  Message,
 } from 'rsuite';
 import SearchIcon from '@rsuite/icons/Search';
 import MoreIcon from '@rsuite/icons/legacy/More';
 import DrawerView from './DrawerView';
 import { mockUsers } from '@/data/mock';
 import { NameCell, CheckCell, ActionCell } from './Cells';
+import {getDestination} from '@/services/destination.service';
+import { ca } from 'date-fns/locale';
 
 const data = mockUsers(1);
 
@@ -20,11 +24,13 @@ const { Column, HeaderCell, Cell } = Table;
 const { getHeight } = DOMHelper;
 
 const DataTable = () => {
-  const [usersData, setUsersData] = useState([]);
+  const toaster = useToaster();
+  const [destinationData, setDestinationData] = useState([]);
   const [showDrawer, setShowDrawer] = useState(false);
   const [checkedKeys, setCheckedKeys] = useState<number[]>([]);
   const [searchKeyword, setSearchKeyword] = useState('');
-
+  const [formValue, setFormValue] = useState<any>({});
+  const [isUpdateForm, setIsUpdateForm] = useState(false);
   let checked = false;
   let indeterminate = false;
 
@@ -44,24 +50,26 @@ const DataTable = () => {
     const keys = checked ? [...checkedKeys, value] : checkedKeys.filter(item => item !== value);
     setCheckedKeys(keys);
   };
-  const loadUsersData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
+  const loadDestinationData = async () => {
+    try{
+      const destinationResult = await getDestination();
+      setDestinationData(destinationResult);
+    }catch(e:any){
+      toaster.push(
+        <Message closable showIcon type="error" duration={9000}>
+        {e.message}
+      </Message>,
+      {
+        placement: 'topCenter'
       }
-    };
-    try {
-      const response = await fetch('http://51.210.242.227:5200/destinations', options);
-      setUsersData(await response.json());
-    } catch (e) {
-      console.log('ERROR: ' + e);
+      );
+      
     }
+    
   };
 
   useEffect(() => {
-    loadUsersData();
+    loadDestinationData();
   }, []);
 
   return (
@@ -81,7 +89,7 @@ const DataTable = () => {
         </Stack>
       </Stack>
 
-      <Table height={Math.max(getHeight(window) - 200, 400)} data={usersData}>
+      <Table height={Math.max(getHeight(window) - 200, 400)} data={destinationData}>
         <Column width={50} align="center" fixed>
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
@@ -141,11 +149,22 @@ const DataTable = () => {
           <HeaderCell>
             <MoreIcon />
           </HeaderCell>
-          <ActionCell dataKey="id" />
+          <ActionCell dataKey="id" 
+          setShowDrawer={setShowDrawer}
+          setFormValue={setFormValue}
+          setIsUpdateForm={setIsUpdateForm}
+          />
         </Column>
       </Table>
 
-      <DrawerView setShowDrawer={setShowDrawer} isOpen={showDrawer} />
+      <DrawerView 
+      setShowDrawer={setShowDrawer} 
+      isOpen={showDrawer} 
+      formValue = {formValue}
+      setFormValue={setFormValue}
+      isUpdateForm={isUpdateForm}
+      loadDestinationData={loadDestinationData}
+      />
     </>
   );
 };

@@ -9,7 +9,38 @@ export const getMembers = () => {
       return data;
     })
     .catch(error => {
-      const errorMsg = error.message;
-      return errorMsg;
+      console.log('message',error.response.data)
+      const errorMsg = error.response.data;
+      console.log('error',errorMsg)
+      throw Error(errorMsg.message)
+    });
+};
+
+
+export const updateMember = (memberId, updatedData) => {
+  return api
+    .patch(`${API_URL}/members/${memberId}`, updatedData)
+    .then(() => {
+      return getMembers();
+    })
+    .catch(error => {
+      console.log('message',error.response.data)
+      const errorMsg = error.response.data;
+      console.log('error',errorMsg)
+      throw Error(errorMsg.message)
+    });
+};
+
+export const addMember = (newMemberData) => {
+  return api
+    .post(`${API_URL}/members`, newMemberData)
+    .then(() => {
+      return getMembers();
+    })
+    .catch(error => {
+      console.log('message',error.response.data)
+      const errorMsg = error.response.data;
+      console.log('error',errorMsg)
+      throw Error(errorMsg.message)
     });
 };

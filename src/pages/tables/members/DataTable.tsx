@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Input, InputGroup, Table, Button, DOMHelper, Checkbox, Stack, Loader } from 'rsuite';
+import { Input, InputGroup, Table, Button, DOMHelper, Checkbox, Stack, Loader, useToaster, Message } from 'rsuite';
 import SearchIcon from '@rsuite/icons/Search';
 import MoreIcon from '@rsuite/icons/legacy/More';
 import DrawerView from './DrawerView';
 import { NameCell, CheckCell, ActionCell } from './Cells';
+import { getMembers } from '@/services/member.service';
+import {getVehicule} from '@/services/vehicle.service';
+
 
 const { Column, HeaderCell, Cell } = Table;
 const { getHeight } = DOMHelper;
 
 const DataTable = () => {
+  const toaster = useToaster();
+
   const [usersData, setUsersData] = useState<any>([]);
   const [transportsData, setTransportsData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -38,35 +43,38 @@ const DataTable = () => {
     setCheckedKeys(keys);
   };
   const loadUsersData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
     try {
-      const response = await fetch('http://51.210.242.227:5200/members', options);
-      const data = await response.json();
-      setUsersData(data);
-    } catch (e) {
-      console.log('ERROR: ' + e);
+      const usersResult = await getMembers();
+      setUsersData(usersResult);
+
+    } catch (e:any) {
+      console.log('e',e.message)
+      toaster.push(
+      <Message closable showIcon type="error" duration={9000}>
+        {e.message}
+      </Message>,
+      {
+        placement: 'topCenter'
+      }
+    );
     }
   };
+
   const loadTransportsData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
     try {
-      const response = await fetch('http://51.210.242.227:5200/transports', options);
-      const data = await response.json();
-      setTransportsData(data);
-    } catch (e) {
-      console.log('ERROR: ' + e);
+      const vehiculeResult = await getVehicule();
+      setTransportsData(vehiculeResult);
+
+    } catch (e:any) {
+      console.log('e',e.message)
+      toaster.push(
+      <Message closable showIcon type="error" duration={9000}>
+        {e.message}
+      </Message>,
+      {
+        placement: 'topCenter'
+      }
+    );
     }
   };
 
@@ -147,12 +155,12 @@ const DataTable = () => {
 
           <Column width={300}>
             <HeaderCell>Assigned Vehicle</HeaderCell>
-            {/* <Cell dataKey="vehicle" /> */}
+            {/* <<Cell dataKey="vehicle" /> */}
             <Cell>
               {rowData => {
                 return (
                   <p>
-                    {rowData.vehicle?.brand} {rowData.vehicle?.model} {rowData.vehicle?.matricule}
+                    {rowData.vehicle?.brand} {rowData.vehicle?.model} {/*rowData.vehicle?.matricule*/}
                   </p>
                 );
               }}

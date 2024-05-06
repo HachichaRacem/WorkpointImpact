@@ -1,27 +1,80 @@
 import React, { useState } from 'react';
-import { Drawer, Button, Form } from 'rsuite';
+import { Drawer, Button, Form, useToaster, Message } from 'rsuite';
+import{addDestination,updateDestination} from '@/services/destination.service'
 
-const DrawerView = ({ setShowDrawer, isOpen }) => {
-  const [formValue,setFormValue] = useState<any>({});
+const DrawerView = ({ 
+  setShowDrawer, 
+  isOpen,
+  formValue,
+  setFormValue,
+  isUpdateForm,
+  loadDestinationData 
+
+}) => {
+  const toaster = useToaster();
+
   const handleConfirmClick = async () => {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      },
-      body: JSON.stringify(formValue)
-    };
-    try {
-      const response = await fetch('http://51.210.242.227:5200/destinations', options);
-      if (response.ok) {
-        setShowDrawer(false);
-      } else {
-        console.log(JSON.stringify(await response.json()));
+    if(isUpdateForm){
+      try{
+        const response = await updateDestination(formValue['_id'],formValue);
+        if(response.ok){
+          await loadDestinationData();
+          setShowDrawer(false);
+        }else{
+          console.log(JSON.stringify(await response.json()));
+        }
+      } catch(e:any) {
+        console.log('e',e.message)
+        toaster.push(
+        <Message closable showIcon type="error" duration={9000}>
+          {e.message}
+        </Message>,
+        {
+          placement: 'topCenter'
+        }
+      );
       }
-    } catch (e) {
-      console.log('ERROR: ' + e);
+    }else{
+      try{
+        const response = await addDestination(formValue)
+        if(response.ok){
+          await loadDestinationData();
+          setShowDrawer(false);
+        }else{
+          console.log(JSON.stringify(await response.json()));
+        }
+      }catch (e:any) {
+        console.log('e',e.message)
+        toaster.push(
+        <Message closable showIcon type="error" duration={9000}>
+          {e.message}
+        </Message>,
+        {
+          placement: 'topCenter'
+        }
+      );
+      }
     }
+
+
+    // const options = {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Accept: 'application/json'
+    //   },
+    //   body: JSON.stringify(formValue)
+    // };
+    // try {
+    //   const response = await fetch('http://51.210.242.227:5200/destinations', options);
+    //   if (response.ok) {
+    //     setShowDrawer(false);
+    //   } else {
+    //     console.log(JSON.stringify(await response.json()));
+    //   }
+    // } catch (e) {
+    //   console.log('ERROR: ' + e);
+    // }
   };
 
   return (

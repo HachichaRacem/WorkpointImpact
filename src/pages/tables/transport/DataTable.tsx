@@ -7,12 +7,17 @@ import {
   DOMHelper,
   Checkbox,
   Stack,
+  useToaster,
+  Message,
 } from 'rsuite';
 import SearchIcon from '@rsuite/icons/Search';
 import MoreIcon from '@rsuite/icons/legacy/More';
 import DrawerView from './DrawerView';
 import { mockUsers } from '@/data/mock';
 import { NameCell, CheckCell, ActionCell } from './Cells';
+import {getVehicule} from '@/services/vehicle.service';
+import { error } from 'console';
+
 
 const data = mockUsers(1);
 
@@ -21,12 +26,16 @@ const { getHeight } = DOMHelper;
 
 
 const DataTable = () => {
+  const toaster = useToaster();
+  console.log("hello3")
   const [showDrawer, setShowDrawer] = useState(false);
   const [checkedKeys, setCheckedKeys] = useState<number[]>([]);
   const [sortColumn, setSortColumn] = useState();
   const [sortType, setSortType] = useState();
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [usersData, setUsersData] = useState<any>([]);
+  const [transportsData, setTransportsData] = useState<any>([]);
+  const [formValue, setFormValue] = useState<any>({});
+  const [isUpdateForm, setIsUpdateForm] = useState(false);
   let checked = false;
   let indeterminate = false;
 
@@ -83,31 +92,37 @@ const DataTable = () => {
     }
     return filtered;
   };
-  const loadUsersData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
+  const loadTransportsData = async () => {
     try {
-      const response = await fetch('http://51.210.242.227:5200/transports', options);
-      setUsersData(await response.json());
-    } catch (e) {
-      console.log('ERROR: ' + e);
+      const vehiculeResult = await getVehicule()
+     
+      setTransportsData(vehiculeResult);
+    } catch (e:any) {
+      console.log('e',e.message)
+      toaster.push(
+      <Message closable showIcon type="error" duration={9000}>
+        {e.message}
+      </Message>,
+      {
+        placement: 'topCenter'
+      }
+    );
     }
   };
 
   useEffect(() => {
-    loadUsersData();
+    loadTransportsData();
   }, []);
 
 
   return (
     <>
       <Stack className="table-toolbar" justifyContent="space-between">
-        <Button appearance="primary" onClick={() => setShowDrawer(true)}>
+        <Button appearance="primary" onClick={() => {
+          setShowDrawer(true);
+          setIsUpdateForm(false);
+        }
+          }>
           Add Vehicle
         </Button>
 
@@ -123,7 +138,7 @@ const DataTable = () => {
 
       <Table
         height={Math.max(getHeight(window) - 200, 400)}
-        data={usersData}
+        data={transportsData}
         sortColumn={sortColumn}
         sortType={sortType}
         onSortColumn={handleSortColumn}
@@ -184,13 +199,27 @@ const DataTable = () => {
           <HeaderCell>
             <MoreIcon />
           </HeaderCell>
-          <ActionCell dataKey="id" />
+          <ActionCell dataKey="id"
+            setShowDrawer={setShowDrawer}
+            setFormValue={setFormValue}
+            setIsUpdateForm={setIsUpdateForm}
+          />
         </Column>
       </Table>
 
-      <DrawerView setShowDrawer={setShowDrawer} isOpen={showDrawer} />
+      <DrawerView 
+      setShowDrawer={setShowDrawer} 
+      isOpen={showDrawer} 
+      formValue = {formValue}
+      setFormValue={setFormValue}
+      isUpdateForm={isUpdateForm}
+      loadTransportsData={loadTransportsData}
+      //transportsData={transportsData}
+      />
     </>
   );
 };
 
 export default DataTable;
+
+

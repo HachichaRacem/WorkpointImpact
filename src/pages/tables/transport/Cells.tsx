@@ -68,8 +68,18 @@ export const CheckCell = ({
   </Cell>
 );
 
-const renderMenu = ({ onClose, left, top, className }: any, ref) => {
+const renderMenu = ({ onClose, left, top, className }: any, 
+  ref,
+  setShowDrawer,
+  rowData,
+  setFormValue,
+  setIsUpdateForm) => {
   const handleSelect = eventKey => {
+    if(eventKey == 2){
+      setIsUpdateForm(true);
+      setFormValue(rowData);
+      setShowDrawer(true);
+    }
     onClose();
     console.log(eventKey);
   };
@@ -85,9 +95,14 @@ const renderMenu = ({ onClose, left, top, className }: any, ref) => {
 };
 
 export const ActionCell = props => {
+  const rowData = props['rowData'];
+  const setShowDrawer = props['setShowDrawer'];
+  const setFormValue = props['setFormValue'];
+  const setIsUpdateForm = props['setIsUpdateForm'];
   return (
     <Cell {...props} className="link-group">
-      <Whisper placement="autoVerticalEnd" trigger="click" speaker={renderMenu}>
+      <Whisper placement="autoVerticalEnd" trigger="click" speaker={(props, ref) => {
+          return renderMenu(props, ref, setShowDrawer, rowData, setFormValue, setIsUpdateForm);}}>
         <IconButton appearance="subtle" icon={<MoreIcon />} />
       </Whisper>
     </Cell>
