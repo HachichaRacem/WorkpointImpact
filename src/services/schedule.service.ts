@@ -27,3 +27,15 @@ export const getScheduleByUserDate = (userId, date) => {
     });
 };
 
+  export const uploadScheduleData = (file) =>{
+    return api
+      .post(`${API_URL}/schedule/${file}`)
+      .then(response =>{
+        console.log('Upload successful:', response);
+      })
+      .catch(error => {
+        const errorMsg = error.message;
+        return errorMsg;
+      });
+  };
+

@@ -9,7 +9,8 @@ const DrawerView = ({
   setFormValue,
   isUpdateForm,
   loadUsersData,
-  transportsData
+  transportsData,
+  usersData
 }) => {
   const transportsList = transportsData.map(veh => {
     const vehName: string = veh['brand'] + veh['model'] + veh['matricule'];
@@ -32,7 +33,7 @@ const DrawerView = ({
       try {
         console.log('hmhmhm',JSON.stringify(formValue))
         console.log('kkk',formValue['_id'])
-        const response = await updateMember(formValue['_id'],formValue);
+        const response = await updateMember(formValue,formValue['_id']);
         if (response.ok) {
           await loadUsersData();
           setShowDrawer(false);
@@ -128,6 +129,16 @@ const DrawerView = ({
               }
               accepter={SelectPicker}
               data={transportsList}
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.ControlLabel>profile</Form.ControlLabel>
+            <Form.Control name="profile" 
+           /* value={
+              formValue.profile?.name 
+            }
+            accepter={SelectPicker}
+            data={usersData}*/
             />
           </Form.Group>
           <Form.Group>

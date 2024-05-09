@@ -22,7 +22,7 @@ export const getVehicule = () => {
 
 export const updateVehicule = (vehiculeId, updatedData) => {
   return api
-    .patch(`${API_URL}/transports/${vehiculeId}`, updatedData)
+    .patch(`${API_URL}/transports/${vehiculeId}/${updatedData}`)
     .then(() => {
       return getVehicule();
     })
@@ -36,7 +36,7 @@ export const updateVehicule = (vehiculeId, updatedData) => {
 
 export const addVehicule = (newVehiculeData) => {
   return api
-    .post(`${API_URL}/transports`, newVehiculeData)
+    .post(`${API_URL}/transports/${newVehiculeData}`)
     .then(() => {
       return getVehicule();
     })

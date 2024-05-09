@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import L from 'leaflet';
+import L, { point } from 'leaflet';
 // import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet-routing-machine';
@@ -10,6 +10,7 @@ const MapComponent = props => {
 
   const mapRef = useRef(null);
   const map = useRef<any>(null);
+  const routeRef = useRef<any>(null);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -41,6 +42,13 @@ const MapComponent = props => {
         //   fitSelectedRoutes: true,
         //   showAlternatives: false
         // }).addTo(map.current);
+        if(routeRef.current){
+          routeRef.current.remove();
+          routeRef.current= null;
+        }
+        if(points.length == 0){
+          return 
+        }
 
         const routeControl = L.Routing.control({
           plan: L.Routing.plan(points, {
@@ -55,8 +63,8 @@ const MapComponent = props => {
               console.log('🚀 ~ useEffect ~ wp:', wp.latLng);
               const destination = destinations.find(
                 item =>
-                  Number(item.Destination.latitude) == Number(wp.latLng.lat) &&
-                  Number(item.Destination.longitude) == Number(wp.latLng.lng)
+                  Number(item.destination.latitude) == Number(wp.latLng.lat) &&
+                  Number(item.destination.longitude) == Number(wp.latLng.lng)
               );
               console.log('🚀 ~  destination:', destination);
 
@@ -64,7 +72,7 @@ const MapComponent = props => {
                 draggable: false
               })
                 // .setLatLng(wp.latLng)
-                .bindPopup(`Destination ${i + 1} <br/> <b>${destination.Destination.name}</b>`);
+                .bindPopup(`Destination ${i + 1} <br/> <b>${destination.destination.name}</b>`);
               marker.on('click', function (e) {
                 this.openPopup();
               });
@@ -74,8 +82,9 @@ const MapComponent = props => {
               return marker;
             }
           })
-        }).addTo(map.current);
-
+        }
+      ).addTo(map.current);
+        routeRef.current = routeControl ;
         routeControl.on('routesfound', function (e) {
           const routes = e.routes;
           const summary = routes[0].summary;

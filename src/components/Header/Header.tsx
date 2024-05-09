@@ -114,40 +114,30 @@ const renderNoticeSpeaker = ({ onClose, left, top, className }: any, ref) => {
 const Header = () => {
   const trigger = useRef<WhisperInstance>(null);
  
-  const handleFileUpload = async (e) =>{
-    const file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const response = await fetch('http://51.210.242.227:5200/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      if (response.ok) {
-        console.log('File uploaded successfully');
-        // Do something if upload is successful
-      } else {
-        console.error('Error uploading file');
-        // Handle error if upload fails
-      }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      // Handle network error
-    }
-  };
+  // const handleFileUpload = async (e) =>{
+  //   const file = e.target.files[0];
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   try {
+  //     const response = await fetch('http://51.210.242.227:5200/upload', {
+  //       method: 'POST',
+  //       body: formData,
+  //     });
+  //     if (response.ok) {
+  //       console.log('File uploaded successfully');
+  //       // Do something if upload is successful
+  //     } else {
+  //       console.error('Error uploading file');
+  //       // Handle error if upload fails
+  //     }
+  //   } catch (error) {
+  //     console.error('Error uploading file:', error);
+  //     // Handle network error
+  //   }
+  // };
   return (
     <Stack className="header" spacing={8}>
-       <div style={{textAlign:'center', paddingBottom: 10}}>
-       <label htmlFor="uploadInput" style={{ color: 'white', backgroundColor: '#3498ff', padding: '9px 10px', borderRadius: '5px', cursor: 'pointer' }}>Upload File
-  <input 
-    type="file" 
-    id="uploadInput" 
-    name="uploadInput"
-    onChange={handleFileUpload}
-    style={{ display: 'none' }}
-  />
-</label>
-            </div>
+       
 
       <Whisper placement="bottomEnd" trigger="click" ref={trigger} speaker={renderNoticeSpeaker}>
         <IconButton

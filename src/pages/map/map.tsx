@@ -38,8 +38,8 @@ const Map = () => {
 
   const [] = useState([]);
   const [points, setPoints] = useState([]);
-  const [fullNames, setFullNames] = useState([]);
-  const [selectedMember, setSelectedMembe] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDetails, setShowDetails] = useState(false); // Nouvel état pour gérer l'affichage
   const [distance, setDistance] = useState(0);
@@ -56,9 +56,13 @@ const Map = () => {
     try {
       const usersResult = await getMembers();
 
-      const fullName = usersResult.map(item => item.fullName);
+      const fullName = usersResult.map(item => {return {
+        ...item,
+        label:item.fullName,
+        value:item._id
+      }});
 
-      setFullNames(fullName);
+      setUsers(fullName);
     } catch (e) {
       console.log('ERROR: ' + e);
     }
@@ -72,20 +76,17 @@ const Map = () => {
           format(selectedDate, 'yyyy-MM-dd')
         );
 
-        const sortedResult = responseData?.schedule?.sort((a, b) => {
-          return a.sequence - b.sequence;
-        });
 
-        console.log('🚀 ~ loadSchedule ~ sortedResult:', sortedResult);
+        console.log('🚀 ~ loadSchedule ~ sortedResult:', responseData);
 
         const result: any = [];
-        responseData?.schedule.map(point => {
-          result.push(L.latLng(point.Destination.latitude, point.Destination.longitude));
+        responseData?.map(point => {
+          result.push(L.latLng(point.destination.latitude, point.destination.longitude));
         });
         setPoints(result);
-        setDestinations(responseData?.schedule);
+        setDestinations(responseData);
         setShowDetails(true);
-        setCar(responseData.car);
+        setCar(responseData[0].user.vehicle);
       } else {
         toaster.push(
           <Message closable showIcon type="error" duration={9000}>
@@ -117,6 +118,12 @@ const Map = () => {
   useEffect(() => {
     loadUsersData();
   }, []);
+
+  useEffect(() => {
+    setPoints([]);
+    setDestinations([]);
+    setShowDetails(false);
+  }, [selectedDate,selectedMember]);
 
   const handleClosePanel = () => {
     setShowDetails(false);
@@ -169,7 +176,7 @@ const Map = () => {
             size="md"
             style={{ width: 200 }}
             data={fullNames.map(name => ({ label: name, value: name }))}
-            onChange={value => setSelectedMembe(value)} // Update selected member on change
+            onChange={value => setSelectedMember(value)} // Update selected member on change
           />
 
           <IconButton icon={<FaSearch />} appearance="primary" onClick={loadSchedule} />
@@ -189,8 +196,8 @@ const Map = () => {
         <SelectPicker
           placeholder="Select member"
           size="md"
-          data={fullNames.map(name => ({ label: name, value: name }))}
-          onChange={value => setSelectedMembe(value)} // Update selected member on change
+          data={users}
+          onChange={value => setSelectedMember(value)} // Update selected member on change
           style={{ width: 200 }}
         />
 

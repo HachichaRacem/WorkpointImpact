@@ -17,9 +17,9 @@ export const getMembers = () => {
 };
 
 
-export const updateMember = (memberId, updatedData) => {
+export const updateMember = (memberId,updatedData ) => {
   return api
-    .patch(`${API_URL}/members/${memberId}`, updatedData)
+    .put(`${API_URL}/members/${memberId}/${updatedData}`)
     .then(() => {
       return getMembers();
     })
@@ -33,7 +33,7 @@ export const updateMember = (memberId, updatedData) => {
 
 export const addMember = (newMemberData) => {
   return api
-    .post(`${API_URL}/members`, newMemberData)
+    .post(`${API_URL}/members/${newMemberData}`)
     .then(() => {
       return getMembers();
     })

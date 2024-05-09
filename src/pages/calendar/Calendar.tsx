@@ -38,8 +38,11 @@ const Calendar = () => {
   const loadData = async () => {
     try {
       const usersResult = await getMembers();
-      const fullName = usersResult.map(item => item.fullName);
-
+      const fullName = usersResult.map(item => {return {
+        ...item,
+        label:item.fullName,
+        value:item._id
+      }});
       setUsers(fullName);
     } catch (e) {
       console.log('ERROR: ' + e);
@@ -67,20 +70,20 @@ const Calendar = () => {
       title: item.destination?.name,
       allDay: false,
       start:
-        format(new Date(item.Date), 'yyyy-MM-dd') +
+        format(new Date(item.date), 'yyyy-MM-dd') +
         `${item.Slot == 'AM' ? 'T09:00:00' : 'T13:00:00'}`,
       end:
-        format(new Date(item.Date), 'yyyy-MM-dd') +
+        format(new Date(item.date), 'yyyy-MM-dd') +
         `${item.Slot == 'AM' ? 'T12:00:00' : 'T18:00:00'}`,
 
-      address: item.Adresse,
-      car: item.car
+      address: item.adresse,
+      user: item.user
     }));
 
     setData(res);
     setLoading(false);
   };
-
+console.log(user)
   return (
     <PageContent className="calendar-app">
       <CalendarHeader

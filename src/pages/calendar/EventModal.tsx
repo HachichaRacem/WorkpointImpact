@@ -7,6 +7,7 @@ interface EventModalProps extends ModalProps {
 
 const EventModal = props => {
   const { onClose, open, onAddEvent, eventInfo, ...rest } = props;
+  console.log(eventInfo)
 
   return (
     <Modal open={open} onClose={onClose} backdrop="static" {...rest}>
@@ -48,10 +49,10 @@ const EventModal = props => {
             </Stack>
           </Form.Group>
           <Form.Group controlId="description">
-            <Form.ControlLabel>Car</Form.ControlLabel>
+            <Form.ControlLabel>Vehicle</Form.ControlLabel>
             <Form.Control
               name="description"
-              value={`${eventInfo?.car?.brand} ${eventInfo?.car?.model}`}
+              value={`${eventInfo?.user?.vehicle?.brand} ${eventInfo?.user?.vehicle?.model}`}
             />
           </Form.Group>
         </Form>

@@ -155,12 +155,25 @@ const DataTable = () => {
 
           <Column width={300}>
             <HeaderCell>Assigned Vehicle</HeaderCell>
-            {/* <<Cell dataKey="vehicle" /> */}
+             {/*<Cell dataKey="vehicle" /> */}
             <Cell>
               {rowData => {
                 return (
                   <p>
                     {rowData.vehicle?.brand} {rowData.vehicle?.model} {/*rowData.vehicle?.matricule*/}
+                  </p>
+                );
+              }}
+            </Cell>
+          </Column>
+
+          <Column width={150}>
+            <HeaderCell>profile</HeaderCell>
+            <Cell>
+              {rowData => {
+                return (
+                  <p>
+                    {rowData.profile?.name}
                   </p>
                 );
               }}
@@ -188,6 +201,7 @@ const DataTable = () => {
           isUpdateForm={isUpdateForm}
           loadUsersData={loadUsersData}
           transportsData={transportsData}
+          usersData={usersData}
         />
       </>
     );
