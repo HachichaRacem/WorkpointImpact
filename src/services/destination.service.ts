@@ -34,7 +34,7 @@ export const updateDestination = (destinationId, updatedData) => {
     return api
       .post(`${API_URL}/destinations`,newDestinationData)
       .then(() => {
-        return getDestination();
+        return getDestination(); 
       })
       .catch(error => {
         const errorMsg = error.message;
