@@ -20,7 +20,7 @@ export const getDestination = () => {
 
 export const updateDestination = (destinationId, updatedData) => {
     return api
-      .patch(`${API_URL}/destinations/${destinationId}/${updatedData}`)
+      .put(`${API_URL}/destinations/update/${destinationId}`,updatedData)
       .then(() => {
         return getDestination();
       })
@@ -32,7 +32,7 @@ export const updateDestination = (destinationId, updatedData) => {
 
   export const addDestination = (newDestinationData) => {
     return api
-      .post(`${API_URL}/destinations/${newDestinationData}`)
+      .post(`${API_URL}/destinations`,newDestinationData)
       .then(() => {
         return getDestination();
       })

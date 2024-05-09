@@ -33,7 +33,7 @@ const DrawerView = ({
       try {
         console.log('hmhmhm',JSON.stringify(formValue))
         console.log('kkk',formValue['_id'])
-        const response = await updateMember(formValue,formValue['_id']);
+        const response = await updateMember(formValue['_id'],formValue);
         if (response.ok) {
           await loadUsersData();
           setShowDrawer(false);

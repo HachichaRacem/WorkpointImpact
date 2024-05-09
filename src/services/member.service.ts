@@ -19,7 +19,7 @@ export const getMembers = () => {
 
 export const updateMember = (memberId,updatedData ) => {
   return api
-    .put(`${API_URL}/members/${memberId}/${updatedData}`)
+    .put(`${API_URL}/members/update/${memberId}`,updatedData)
     .then(() => {
       return getMembers();
     })
@@ -33,7 +33,7 @@ export const updateMember = (memberId,updatedData ) => {
 
 export const addMember = (newMemberData) => {
   return api
-    .post(`${API_URL}/members/${newMemberData}`)
+    .post(`${API_URL}/members`,newMemberData)
     .then(() => {
       return getMembers();
     })
