@@ -29,7 +29,7 @@ export const getScheduleByUserDate = (userId, date) => {
 
   export const uploadScheduleData = (file) =>{
     return api
-      .post(`${API_URL}/schedule/${file}`)
+      .post(`${API_URL}/schedule/upload`,file)
       .then(response =>{
         console.log('Upload successful:', response);
       })

@@ -77,6 +77,7 @@ const renderMenu = ({ onClose, left, top, className }: any,
   const handleSelect = eventKey => {
     if(eventKey == 2){
       setIsUpdateForm(true);
+      console.log('row Data',rowData)
       setFormValue(rowData);
       setShowDrawer(true);
     }

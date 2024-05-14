@@ -25,12 +25,10 @@ const DrawerView = ({
     if(isUpdateForm){
       try{
         const response = await updateVehicule(formValue['_id'],formValue);
-        if(response.ok){
+        
           await loadTransportsData();
           setShowDrawer(false);
-        } else{
-          console.log(JSON.stringify(await response.json()));
-        }
+       
       } catch (e:any) {
         console.log('e',e.message)
         toaster.push(
@@ -45,12 +43,10 @@ const DrawerView = ({
     } else {
       try {
       const response = await addVehicule(formValue) ;
-      if(response.ok){
+      
         await loadTransportsData();
         setShowDrawer(false);
-      } else{
-        console.log(JSON.stringify(await response.json()));
-      }
+      
     }catch (e:any) {
       console.log('e',e.message)
       toaster.push(
@@ -72,6 +68,7 @@ const DrawerView = ({
     //   console.log('ERROR: ' + e);
 
     // }
+    setFormValue({});
   }
 
   // const handleConfirmClick = async () => {
@@ -105,14 +102,18 @@ const DrawerView = ({
           <Button onClick={handleConfirmClick} appearance="primary">
             Confirm
           </Button>
-          <Button onClick={() => setShowDrawer(false)} appearance="subtle">
+          <Button onClick={() =>{
+            setFormValue({});             
+            setShowDrawer(false);
+          }}
+          appearance="subtle">
             Cancel
           </Button>
         </Drawer.Actions>
       </Drawer.Header>
 
       <Drawer.Body>
-        <Form onChange={setFormValue} fluid>
+        <Form onChange={setFormValue} fluid formValue={formValue}>
           <Stack justifyContent="space-between" style={{ marginBottom: 20 }}>
             <Form.Group>
               <Form.ControlLabel>Brand</Form.ControlLabel>
@@ -147,6 +148,3 @@ const DrawerView = ({
 };
 
 export default DrawerView;
-function setShowDrawer(_arg0: boolean) {
-  throw new Error('Function not implemented.');
-}

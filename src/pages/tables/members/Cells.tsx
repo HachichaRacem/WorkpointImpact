@@ -55,7 +55,6 @@ const renderMenu = (
       <Dropdown.Menu onSelect={handleSelect}>
         <Dropdown.Item eventKey={1}>View Profile</Dropdown.Item>
         <Dropdown.Item eventKey={2}>Update Member</Dropdown.Item>
-        <Dropdown.Item eventKey={3}>Update Vehicle</Dropdown.Item>
         <Dropdown.Item eventKey={4}>Block Member</Dropdown.Item>
       </Dropdown.Menu>
     </Popover>

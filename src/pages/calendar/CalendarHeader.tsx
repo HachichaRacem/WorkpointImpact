@@ -69,6 +69,7 @@ const CalendarHeader = ({ refs, users, setUser, user, setLoading }) => {
     // }
     try{
       const response = await uploadScheduleData(formData);
+      console.log("response",response)
       if(response.ok){
         console.log('File uploaded successfully');
       }else{

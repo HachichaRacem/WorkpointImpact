@@ -6,7 +6,7 @@ import DrawerView from './DrawerView';
 import { NameCell, CheckCell, ActionCell } from './Cells';
 import { getMembers } from '@/services/member.service';
 import {getVehicule} from '@/services/vehicle.service';
-
+import {getProfile} from '@/services/profile.service'
 
 const { Column, HeaderCell, Cell } = Table;
 const { getHeight } = DOMHelper;
@@ -16,6 +16,7 @@ const DataTable = () => {
 
   const [usersData, setUsersData] = useState<any>([]);
   const [transportsData, setTransportsData] = useState<any>([]);
+  const [profilesData, setProfilesData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showDrawer, setShowDrawer] = useState(false);
   const [checkedKeys, setCheckedKeys] = useState<number[]>([]);
@@ -78,10 +79,30 @@ const DataTable = () => {
     }
   };
 
+  const loadProfileData = async () => {
+    try{
+      const profileResult = await getProfile();
+      console.log('profile',profileResult)
+      setProfilesData(profileResult);
+    }
+    catch(e:any) {
+      console.log('e',e.message)
+      toaster.push(
+      <Message closable showIcon type="error" duration={9000}>
+        {e.message}
+      </Message>,
+      {
+        placement: 'topCenter'
+      }
+    );
+    }
+  };
+
   const loadData = async () => {
     try {
       await loadUsersData();
       await loadTransportsData();
+      await loadProfileData();
       setIsLoading(false);
     } catch (e) {
       console.log('ERROR : ' + e);
@@ -201,6 +222,7 @@ const DataTable = () => {
           isUpdateForm={isUpdateForm}
           loadUsersData={loadUsersData}
           transportsData={transportsData}
+          profileData={profilesData}
           usersData={usersData}
         />
       </>

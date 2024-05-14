@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, Button, Form, SelectPicker } from 'rsuite';
+import { Drawer, Button, Form, SelectPicker, useToaster, Message } from 'rsuite';
 import {updateMember,addMember} from '@/services/member.service'
 
 const DrawerView = ({
@@ -10,8 +10,11 @@ const DrawerView = ({
   isUpdateForm,
   loadUsersData,
   transportsData,
+  profileData,
   usersData
 }) => {
+  const toaster = useToaster();
+
   const transportsList = transportsData.map(veh => {
     const vehName: string = veh['brand'] + veh['model'] + veh['matricule'];
     return {
@@ -19,6 +22,15 @@ const DrawerView = ({
       value: vehName
     };
   });
+
+  const profileList = profileData.map(prof => {
+    const profName: String = prof['name'];
+    return{
+      label: profName,
+      value: profName
+    }
+  });
+
   const handleConfirmClick = async () => {
     if (isUpdateForm) {
       // const options = {
@@ -34,14 +46,20 @@ const DrawerView = ({
         console.log('hmhmhm',JSON.stringify(formValue))
         console.log('kkk',formValue['_id'])
         const response = await updateMember(formValue['_id'],formValue);
-        if (response.ok) {
+        
+          console.log("ya weldi d5altchi")
           await loadUsersData();
           setShowDrawer(false);
-        } else {
-          console.log(JSON.stringify(await response.json()));
+      } catch (e:any) {
+        console.log('e',e.message)
+        toaster.push(
+        <Message closable showIcon type="error" duration={9000}>
+          {e.message}
+        </Message>,
+        {
+          placement: 'topCenter'
         }
-      } catch (e) {
-        console.log('ERROR: ' + e);
+      );
       }
     } else {
       // const options = {
@@ -60,8 +78,16 @@ const DrawerView = ({
         } else {
           console.log(JSON.stringify(await response.json()));
         }
-      } catch (e) {
-        console.log('ERROR: ' + e);
+      } catch (e:any) {
+        console.log('e',e.message)
+        toaster.push(
+        <Message closable showIcon type="error" duration={9000}>
+          {e.message}
+        </Message>,
+        {
+          placement: 'topCenter'
+        }
+      );
       }
     }
     setFormValue({});
@@ -123,8 +149,7 @@ const DrawerView = ({
               value={
                 formValue.vehicle
                   ? formValue.vehicle?.brand +
-                    formValue.vehicle?.model +
-                    formValue.vehicle?.matricule
+                    formValue.vehicle?.model
                   : null
               }
               accepter={SelectPicker}
@@ -134,11 +159,13 @@ const DrawerView = ({
           <Form.Group>
             <Form.ControlLabel>profile</Form.ControlLabel>
             <Form.Control name="profile" 
-           /* value={
-              formValue.profile?.name 
+            value={
+              formValue.profile
+                ? formValue.profile?.name
+                :null
             }
             accepter={SelectPicker}
-            data={usersData}*/
+            data={profileList}
             />
           </Form.Group>
           <Form.Group>

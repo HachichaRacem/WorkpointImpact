@@ -17,12 +17,10 @@ const DrawerView = ({
     if(isUpdateForm){
       try{
         const response = await updateDestination(formValue['_id'],formValue);
-        if(response.ok){
+        
           await loadDestinationData();
           setShowDrawer(false);
-        }else{
-          console.log(JSON.stringify(await response.json()));
-        }
+        
       } catch(e:any) {
         console.log('e',e.message)
         toaster.push(
@@ -37,12 +35,10 @@ const DrawerView = ({
     }else{
       try{
         const response = await addDestination(formValue)
-        if(response.ok){
+        
           await loadDestinationData();
           setShowDrawer(false);
-        }else{
-          console.log(JSON.stringify(await response.json()));
-        }
+        
       }catch (e:any) {
         console.log('e',e.message)
         toaster.push(
@@ -75,6 +71,7 @@ const DrawerView = ({
     // } catch (e) {
     //   console.log('ERROR: ' + e);
     // }
+    setFormValue({});
   };
 
   return (
@@ -98,7 +95,7 @@ const DrawerView = ({
       </Drawer.Header>
 
       <Drawer.Body>
-      <Form onChange={setFormValue} fluid>
+      <Form onChange={setFormValue} fluid formValue={formValue}>
         <Form.Group>
             <Form.ControlLabel>Name</Form.ControlLabel>
             <Form.Control name="name" />
