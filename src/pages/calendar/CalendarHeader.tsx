@@ -68,7 +68,7 @@ const CalendarHeader = ({ refs, users, setUser, user, setLoading }) => {
     //   // Handle network error
     // }
     try{
-      const response = await uploadScheduleData(formData);
+      const response = await uploadScheduleData(file);
       console.log("response",response)
       if(response.ok){
         console.log('File uploaded successfully');

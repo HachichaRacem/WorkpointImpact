@@ -19,7 +19,7 @@ const DrawerView = ({
     const vehName: string = veh['brand'] + veh['model'] + veh['matricule'];
     return {
       label: vehName,
-      value: vehName
+      value: veh['_id']
     };
   });
 
@@ -27,7 +27,7 @@ const DrawerView = ({
     const profName: String = prof['name'];
     return{
       label: profName,
-      value: profName
+      value: prof['_id']
     }
   });
 
@@ -72,12 +72,10 @@ const DrawerView = ({
       // };
       try {
         const response = await addMember(formValue);
-        if (response.ok) {
+        
           await loadUsersData();
           setShowDrawer(false);
-        } else {
-          console.log(JSON.stringify(await response.json()));
-        }
+        
       } catch (e:any) {
         console.log('e',e.message)
         toaster.push(
