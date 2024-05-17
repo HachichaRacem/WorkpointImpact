@@ -19,6 +19,7 @@ const Calendar = () => {
   const [data, setData] = useState([]);
   const [eventInfo, setEventInfo] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingFile, setLoadingFile] = useState({ open: false, message: '' });
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     console.log(selectInfo);
@@ -38,11 +39,13 @@ const Calendar = () => {
   const loadData = async () => {
     try {
       const usersResult = await getMembers();
-      const fullName = usersResult.map(item => {return {
-        ...item,
-        label:item.fullName,
-        value:item._id
-      }});
+      const fullName = usersResult.map(item => {
+        return {
+          ...item,
+          label: item.fullName,
+          value: item._id
+        };
+      });
       setUsers(fullName);
     } catch (e) {
       console.log('ERROR: ' + e);
@@ -83,15 +86,18 @@ const Calendar = () => {
     setData(res);
     setLoading(false);
   };
-console.log(user)
+  console.log(user);
   return (
     <PageContent className="calendar-app">
+      {loadingFile.open == true && (
+        <Loader backdrop content={loadingFile.message} vertical style={{ zIndex: 9999 }} />
+      )}
       <CalendarHeader
         refs={calendarRef}
         users={users}
         setUser={setUser}
         user={user}
-        setLoading={setLoading}
+        setLoading={setLoadingFile}
       />
       <FullCalendar
         headerToolbar={false}

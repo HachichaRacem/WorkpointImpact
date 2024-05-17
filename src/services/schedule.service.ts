@@ -27,15 +27,31 @@ export const getScheduleByUserDate = (userId, date) => {
     });
 };
 
-  export const uploadScheduleData = (file) =>{
-    return api
-      .post(`${API_URL}/schedule/upload`,file)
-      .then(response =>{
-        console.log('Upload successful:', response);
-      })
-      .catch(error => {
-        const errorMsg = error.message;
-        return errorMsg;
-      });
-  };
+export const uploadScheduleData = formData => {
+  return api
+    .post(`${API_URL}/schedule/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    .then(response => {
+      console.log('Upload successful:', response);
+      return response.data;
+    })
+    .catch(error => {
+      const errorMsg = error.message;
+      return errorMsg;
+    });
+};
 
+export const addScheduleData = data => {
+  return api
+    .post(`${API_URL}/schedule/add`, data)
+    .then(response => {
+      console.log('successful:', response);
+    })
+    .catch(error => {
+      const errorMsg = error.message;
+      return errorMsg;
+    });
+};
