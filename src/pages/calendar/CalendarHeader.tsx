@@ -25,7 +25,7 @@ const CalendarHeader = ({ refs, users, setUser, user, setLoading }) => {
     'August',
     'September',
     'October',
-    'Novemeber',
+    'November',
     'December'
   ];
   const [title, setTitle] = useState(
@@ -66,74 +66,108 @@ const CalendarHeader = ({ refs, users, setUser, user, setLoading }) => {
     setTitle(refs.current.getApi().currentDataManager.data.viewTitle);
   };
 
-  const handleFileUpload = async e => {
+  const handleFileUpload = async (e) => {
     setLoading({ open: true, message: 'Uploading file ...' });
     const file = e.target.files[0];
     const formData = new FormData();
     formData.append('file', file);
-
+  
     try {
       const response = await uploadScheduleData(formData);
       console.log('response', response);
-      if (response.status == 200) {
-        const points: any = [];
-        response.data?.map(point => {
-          points.push(L.latLng(point.latitude, point.longitude));
-        });
-        console.log('File uploaded successfully');
-        // setLoading({ open: false, message: 'Calculating...' });
-        setLoading({ open: true, message: 'Calculating...' });
-        if (map.current) {
-          if (L.Routing) {
-            if (routeRef.current) {
-              routeRef.current.remove();
-              routeRef.current = null;
-            }
-            if (points.length == 0) {
-              return;
-            }
-
-            const routeControl = L.Routing.control({
-              plan: L.Routing.plan(points, {})
-            }).addTo(map.current);
-            routeRef.current = routeControl;
-            routeControl.on('routesfound', async function (e) {
-              const routes = e.routes;
-              const summary = routes[0].summary;
-              console.log('🚀 ~ routes:', routes);
-              console.log('distance', summary.totalDistance / 1000);
-              console.log('totalDuration', Math.round((summary.totalTime % 3600) / 60));
-              const totalDuration = Math.round((summary.totalTime % 3600) / 60);
-              const totalDistance = summary.totalDistance / 1000;
-
-              const res = await addScheduleData({
-                scheduleData: response.data,
-                totalDuration: totalDuration,
-                totalDistance: totalDistance
+      if (response.status === 200) {
+        
+        const groupedData = response.data.reduce((acc, point) => {
+          const key = `${point.user}-${new Date(point.date).toDateString()}`;
+          if (!acc[key]) {
+            acc[key] = [];
+          }
+          acc[key].push(point);
+          return acc;
+        }, {});
+  
+        for (const key in groupedData) {
+          const points = groupedData[key];
+          const latLngPoints = points.map((point) =>
+            L.latLng(point.latitude, point.longitude)
+          );
+  
+          let totalDistance = 0;
+          let totalDuration = 0;
+  
+          if (latLngPoints.length > 1) {
+            if (map.current && L.Routing) {
+              const route = L.Routing.control({
+                waypoints: latLngPoints,
               });
-
-              if (res.status == 200) {
-                toaster.push(
-                  <Message closable showIcon type="success" duration={9000}>
-                    Added successfully
-                  </Message>,
-                  {
-                    placement: 'topCenter'
-                  }
-                );
-              } else {
-                toaster.push(
-                  <Message closable showIcon type="error" duration={9000}>
-                    {res.message}
-                  </Message>,
-                  {
-                    placement: 'topCenter'
-                  }
-                );
-              }
-
-              setLoading({ open: false, message: '' });
+          
+              route.on('routesfound', async function (e) {
+                const routes = e.routes;
+                const summary = routes[0].summary;
+                totalDuration = Math.round((summary.totalTime % 3600) / 60);
+                totalDistance = summary.totalDistance / 1000;
+  
+                // Call addScheduleData with the current group's data and total distance/duration
+                const res = await addScheduleData({
+                  scheduleData: points,
+                  totalDuration,
+                  totalDistance,
+                });
+  
+                if (res.status === 200) {
+                  toaster.push(
+                    <Message closable showIcon type="success" duration={9000}>
+                      Added successfully
+                    </Message>,
+                    {
+                      placement: 'topCenter',
+                    }
+                  );
+                } else {
+                  toaster.push(
+                    <Message closable showIcon type="error" duration={9000}>
+                      {res.message}
+                    </Message>,
+                    {
+                      placement: 'topCenter',
+                    }
+                  );
+                }
+  
+                setLoading({ open: false, message: '' });
+              });
+              
+  
+              route.addTo(map.current);
+            }
+          } else if (latLngPoints.length === 1) {
+            const res = await addScheduleData({
+              scheduleData: points,
+              totalDuration: 0,
+              totalDistance: 0,
             });
+  
+            if (res.status === 200) {
+              toaster.push(
+                <Message closable showIcon type="success" duration={9000}>
+                  Added successfully
+                </Message>,
+                {
+                  placement: 'topCenter',
+                }
+              );
+            } else {
+              toaster.push(
+                <Message closable showIcon type="error" duration={9000}>
+                  {res.message}
+                </Message>,
+                {
+                  placement: 'topCenter',
+                }
+              );
+            }
+  
+            
           }
         }
       } else {
@@ -146,11 +180,22 @@ const CalendarHeader = ({ refs, users, setUser, user, setLoading }) => {
           {e.message}
         </Message>,
         {
-          placement: 'topCenter'
+          placement: 'topCenter',
         }
       );
     }
+    setLoading({ open: false, message: '' });
+    toaster.push(
+      <Message closable showIcon type="success" duration={9000}>
+        Added successfully
+      </Message>,
+      {
+        placement: 'topCenter',
+      }
+    );
+    
   };
+  
 
   return (
     <div>

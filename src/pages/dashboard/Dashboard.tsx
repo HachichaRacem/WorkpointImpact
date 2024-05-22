@@ -2,59 +2,33 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Panel } from 'rsuite';
 import * as images from '../../images/charts';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import DataTable from './DataTable';
 import ScatterIcon from '@rsuite/icons/Scatter';
 import { getMembers } from '@/services/member.service';
-import {getVehicule}from '@/services/vehicle.service'
-import{getDestination} from '@/services/destination.service'
+import { getVehicule } from '@/services/vehicle.service';
+import { getDestination } from '@/services/destination.service';
+import { getAllCarbonEmission } from '@/services/corbon.service';
 
 const Dashboard = () => {
   const [membersCount, setMembersCount] = useState<number>(0);
   const [destinationsCount, setDestinationsCount] = useState<number>(0);
   const [transportsCount, setTransportsCount] = useState<number>(0);
-  const [delegatesData, setDelegatesData] = useState<any>([]);
-
-  /*const loadData = async () => {
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
-    };
-    try {
-      const [members, transports, destinations] = await Promise.all([
-        fetch('http://51.210.242.227:5200/members', options),
-        fetch('http://51.210.242.227:5200/transports', options),
-        fetch('http://51.210.242.227:5200/destinations', options)
-      ]);
-      const [_membersData, transportsData, destinationsData] = await Promise.all([
-        members.json(),
-        transports.json(),
-        destinations.json()
-      ]);
-      setDelegatesData(_membersData);
-      setMembersCount(_membersData.length);
-      setDestinationsCount(destinationsData.length);
-      setTransportsCount(transportsData.length);
-    } catch (e) {
-      console.log('ERROR: ' + e);
-    }
-  };*/
+  const [totalCarbonEmissions, setTotalCarbonEmissions] = useState<number>(0);
 
   const loadData = async () => {
     try {
       const usersResult = await getMembers();
       setMembersCount(usersResult.length);
-      setDelegatesData(usersResult);
-      
+
       const transportsResult = await getVehicule();
       setTransportsCount(transportsResult.length);
 
       const destinationResult = await getDestination();
       setDestinationsCount(destinationResult.length);
 
-
+      const carbonEmissionsResult = await getAllCarbonEmission();
+      const totalCarbon = carbonEmissionsResult.reduce((sum, emission) => sum + emission.carbonEmission, 0);
+      setTotalCarbonEmissions(totalCarbon);
+      console.log("dd", totalCarbon);
     } catch (e) {
       console.log('ERROR: ' + e);
     }
@@ -62,36 +36,61 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadData();
-  });
+  }, []);
+
+  useEffect(() => {
+    console.log("membersCount", membersCount);
+  }, [membersCount]);
+
   return (
     <>
       <Row gutter={30} className="dashboard-header">
         <Col xs={8}>
           <Panel className="trend-box bg-gradient-red">
-            <img className="chart-img" src={images.PVIcon} />
+            <img className="chart-img" src={images.PVIcon} alt="Total Members" />
             <div className="title">Total Members</div>
             <div className="value">{membersCount}</div>
           </Panel>
         </Col>
         <Col xs={8}>
           <Panel className="trend-box bg-gradient-green">
-            <img className="chart-img" src={images.VVICon} />
+            <img className="chart-img" src={images.VVICon} alt="Total Destination" />
             <div className="title">Total Destination</div>
             <div className="value">{destinationsCount}</div>
           </Panel>
         </Col>
         <Col xs={8}>
           <Panel className="trend-box bg-gradient-blue">
-            <img className="chart-img" src={images.UVIcon} />
-            <div className="title">Total Vehicles </div>
+            <img className="chart-img" src={images.UVIcon} alt="Total Vehicles" />
+            <div className="title">Total Vehicles</div>
             <div className="value">{transportsCount}</div>
           </Panel>
         </Col>
       </Row>
 
       <Row gutter={30} className="dashboard-header2">
-        <Col xs={16}>
-          <DataTable data={delegatesData} />
+        <Col xs={16} style={{ paddingTop: 30 }}>
+          <div
+            style={{
+              width: '100%',
+              backgroundColor: 'white',
+              borderRadius: '2px',
+              boxShadow: '0 2px 10px 0 rgba(70, 76, 79, .2)',
+              marginBottom: 20
+            }}
+          >
+            <iframe
+              style={{
+                background: '#FFFFFF',
+                border: 'none',
+                borderRadius: '2px',
+                width: '100%',
+                height: '480px'
+              }}
+              src="https://charts.mongodb.com/charts-project-0-ghfljrb/embed/charts?id=664d223b-62ad-40f6-8d00-7c58f82a4eba&maxDataAge=3600&theme=light&autoRefresh=true"
+              title="MongoDB Chart"
+            ></iframe>
+          </div>
         </Col>
         <Col xs={8} style={{ paddingTop: 30 }}>
           <div style={{ width: '100%', backgroundColor: 'white', borderRadius: 8 }}>
@@ -112,32 +111,56 @@ const Dashboard = () => {
                   color: 'white',
                   position: 'absolute',
                   bottom: 20,
-                  fontSize: 26
+                  fontSize: 20
                 }}
               >
-                Total Carbon
+                Total Carbon:
               </div>
               <div
                 style={{
                   color: 'white',
                   fontWeight: 'bold',
-                  fontSize: 32,
+                  fontSize: 20,
                   position: 'absolute',
-                  right: 30,
+                  right: 70,
                   bottom: 20
                 }}
               >
-                1300kt
+                {totalCarbonEmissions.toFixed(3)} kg CO2eq
               </div>
             </Panel>
           </div>
         </Col>
       </Row>
+
       <div style={{ paddingTop: 20 }}>
         <Row
           gutter={30}
           style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}
         >
+          <Col xs={16} style={{ paddingTop: 30 }}>
+          <div
+            style={{
+              width: '100%',
+              backgroundColor: 'white',
+              borderRadius: '2px',
+              boxShadow: '0 2px 10px 0 rgba(70, 76, 79, .2)',
+              marginBottom: 20
+            }}
+          >
+            <iframe
+              style={{
+                background: '#FFFFFF',
+                border: 'none',
+                borderRadius: '2px',
+                width: '100%',
+                height: '480px'
+              }}
+              src="https://charts.mongodb.com/charts-project-0-ghfljrb/embed/charts?id=664d289e-596c-472e-82d0-37feb7e7109e&maxDataAge=3600&theme=light&autoRefresh=true"
+              title="MongoDB Chart"
+            ></iframe>
+          </div>
+        </Col>
           <div
             style={{
               height: '100%',
@@ -151,9 +174,7 @@ const Dashboard = () => {
             <MapContainer
               center={[36.8065, 10.1815]}
               zoom={13}
-              style={{
-                height: '50vh'
-              }}
+              style={{ height: '50vh' }}
             >
               <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -166,5 +187,5 @@ const Dashboard = () => {
     </>
   );
 };
-export default Dashboard;
 
+export default Dashboard;

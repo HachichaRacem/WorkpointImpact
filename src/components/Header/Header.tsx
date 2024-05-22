@@ -157,7 +157,7 @@ const Header = () => {
         <Avatar
           size="sm"
           circle
-          src="https://avatars.githubusercontent.com/u/119866438?v=4"
+          src="https://avatars.githubusercontent.com/u/132157589?v=4"
           alt="@simonguo"
           style={{ marginLeft: 8 }}
         />
