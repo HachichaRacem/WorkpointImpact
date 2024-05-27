@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Panel } from 'rsuite';
+import { Row, Col, Panel, Button, DatePicker } from 'rsuite';
 import * as images from '../../images/charts';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import ScatterIcon from '@rsuite/icons/Scatter';
@@ -7,13 +7,14 @@ import { getMembers } from '@/services/member.service';
 import { getVehicule } from '@/services/vehicle.service';
 import { getDestination } from '@/services/destination.service';
 import { getAllCarbonEmission } from '@/services/corbon.service';
+import { downloadPDF } from '@/services/corbon.service';
 
 const Dashboard = () => {
   const [membersCount, setMembersCount] = useState<number>(0);
   const [destinationsCount, setDestinationsCount] = useState<number>(0);
   const [transportsCount, setTransportsCount] = useState<number>(0);
   const [totalCarbonEmissions, setTotalCarbonEmissions] = useState<number>(0);
-
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const loadData = async () => {
     try {
       const usersResult = await getMembers();
@@ -28,7 +29,7 @@ const Dashboard = () => {
       const carbonEmissionsResult = await getAllCarbonEmission();
       const totalCarbon = carbonEmissionsResult.reduce((sum, emission) => sum + emission.carbonEmission, 0);
       setTotalCarbonEmissions(totalCarbon);
-      console.log("dd", totalCarbon);
+      
     } catch (e) {
       console.log('ERROR: ' + e);
     }
@@ -161,7 +162,7 @@ const Dashboard = () => {
             ></iframe>
           </div>
         </Col>
-          <div
+         { /*<div
             style={{
               height: '100%',
               width: '80%',
@@ -181,11 +182,11 @@ const Dashboard = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
             </MapContainer>
-          </div>
+          </div>*/}
         </Row>
       </div>
     </>
   );
 };
-
+ 
 export default Dashboard;

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { Affix, Stack, DateRangePicker, IconButton, SelectPicker } from 'rsuite';
+import { Affix, Stack, DateRangePicker, IconButton, SelectPicker, DatePicker, Button, toaster, Message } from 'rsuite';
+import { format } from 'date-fns';
 import SettingIcon from '@rsuite/icons/Setting';
 import subDays from 'date-fns/subDays';
 import startOfWeek from 'date-fns/startOfWeek';
@@ -10,94 +11,45 @@ import endOfMonth from 'date-fns/endOfMonth';
 import addMonths from 'date-fns/addMonths';
 
 import type { RangeType } from 'rsuite/DateRangePicker';
+import { downloadPDF } from '@/services/corbon.service';
+import { MdTry } from 'react-icons/md';
 
 interface Range extends RangeType {
   appearance?: 'default' | 'primary' | 'link' | 'subtle' | 'ghost';
 }
 
-const predefinedRanges: Range[] = [
-  {
-    label: 'Today',
-    value: [new Date(), new Date()],
-    placement: 'left'
-  },
-  {
-    label: 'Yesterday',
-    value: [addDays(new Date(), -1), addDays(new Date(), -1)],
-    placement: 'left'
-  },
-  {
-    label: 'This week',
-    value: [startOfWeek(new Date()), endOfWeek(new Date())],
-    placement: 'left'
-  },
-  {
-    label: 'Last 7 days',
-    value: [subDays(new Date(), 6), new Date()],
-    placement: 'left'
-  },
-  {
-    label: 'Last 30 days',
-    value: [subDays(new Date(), 29), new Date()],
-    placement: 'left'
-  },
-  {
-    label: 'This month',
-    value: [startOfMonth(new Date()), new Date()],
-    placement: 'left'
-  },
-  {
-    label: 'Last month',
-    value: [startOfMonth(addMonths(new Date(), -1)), endOfMonth(addMonths(new Date(), -1))],
-    placement: 'left'
-  },
-  {
-    label: 'This year',
-    value: [new Date(new Date().getFullYear(), 0, 1), new Date()],
-    placement: 'left'
-  },
-  {
-    label: 'Last year',
-    value: [new Date(new Date().getFullYear() - 1, 0, 1), new Date(new Date().getFullYear(), 0, 0)],
-    placement: 'left'
-  },
-  {
-    label: 'All time',
-    value: [new Date(new Date().getFullYear() - 1, 0, 1), new Date()],
-    placement: 'left'
-  },
-  {
-    label: 'Last week',
-    closeOverlay: false,
-    value: value => {
-      const [start = new Date()] = value || [];
-      return [
-        addDays(startOfWeek(start, { weekStartsOn: 0 }), -7),
-        addDays(endOfWeek(start, { weekStartsOn: 0 }), -7)
-      ];
-    },
-    appearance: 'default'
-  },
-  {
-    label: 'Next week',
-    closeOverlay: false,
-    value: value => {
-      const [start = new Date()] = value || [];
-      return [
-        addDays(startOfWeek(start, { weekStartsOn: 0 }), 7),
-        addDays(endOfWeek(start, { weekStartsOn: 0 }), 7)
-      ];
-    },
-    appearance: 'default'
-  }
-];
-
 const PageToolbar = () => {
   const [fixed, setFixed] = useState<boolean | undefined>(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const handleDownloadPDF = async () => {
+    try {
+      
+    
+    if (selectedDate) {
+    const response = await downloadPDF(format(selectedDate, 'yyyy-MM-dd'));
+    if(response.status ===404){
+      toaster.push(
+        <Message closable showIcon type="success" duration={9000}>
+          No emissions found for the given date
+        </Message>,
+        {
+          placement: 'topCenter',
+        }
+      );
+
+
+    }
+    
+  }
+} catch (error) {
+      
+}};
   return (
-    <Affix onChange={setFixed}>
+    
+    
+
       <Stack
         spacing={10}
         justifyContent="space-between"
@@ -112,30 +64,23 @@ const PageToolbar = () => {
         }}
       >
         <Stack spacing={10}>
-          <SelectPicker
-            defaultValue="Daily"
-            cleanable={false}
-            searchable={false}
-            appearance="subtle"
-            container={() => containerRef.current as HTMLDivElement}
-            data={[
-              { label: 'Daily', value: 'Daily' },
-              { label: 'Weekly', value: 'Weekly' },
-              { label: 'Monthly', value: 'Monthly' }
-            ]}
+          <DatePicker
+            format="dd-MM-yyyy"
+            size="md"
+            style={{ width: 200 }}
+            placeholder="Select date"
+            value={selectedDate || undefined} 
+            onChange={date => setSelectedDate(date)} 
           />
-          <DateRangePicker
-            appearance="subtle"
-            defaultValue={[new Date(), new Date()]}
-            showOneCalendar
-            ranges={predefinedRanges}
-            container={() => containerRef.current as HTMLDivElement}
-          />
+          <div>
+                  <Button appearance="primary" style={{ backgroundColor: '#3498ff', borderColor: '#87CEEB',marginLeft:'20px' }}onClick={handleDownloadPDF}>
+                   Download PDF
+                  </Button>
+                </div>
         </Stack>
-
-        <IconButton icon={<SettingIcon style={{ fontSize: 20 }} />} />
+ 
       </Stack>
-    </Affix>
+    
   );
 };
 
