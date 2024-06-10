@@ -49,10 +49,10 @@ export const appNavs = [
 
     ]
   },
-  {
+ /* {
     eventKey: 'authentication',
     title: 'Authentication',
     icon: <Icon as={MdFingerprint} />,
     to: '/sign-in'
-  }
+  }*/
 ];

@@ -2,8 +2,19 @@ import { API_URL } from '../constants.js';
 import api from './api';
 
 export const getScheduleByUser = userId => {
+  const memberString = localStorage.getItem('member');
+  if (!memberString) {
+    throw new Error('No member found in localStorage');
+  }
+
+  const member = JSON.parse(memberString);
+  const token = member.token;
   return api
-    .get(`${API_URL}/schedule/${userId}`)
+    .get(`${API_URL}/schedule/${userId}`,{
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
     .then(response => {
       const data = response.data;
       return data;
@@ -15,8 +26,19 @@ export const getScheduleByUser = userId => {
 };
 
 export const getScheduleByUserDate = (userId, date) => {
+  const memberString = localStorage.getItem('member');
+  if (!memberString) {
+    throw new Error('No member found in localStorage');
+  }
+
+  const member = JSON.parse(memberString);
+  const token = member.token;
   return api
-    .get(`${API_URL}/schedule/${userId}/${date}`)
+    .get(`${API_URL}/schedule/${userId}/${date}`,{
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
     .then(response => {
       const data = response.data;
       return data;
